@@ -6,11 +6,14 @@ import play.api.mvc._
 object Application extends Controller {
 
   def index = Action {
-    Ok(views.html.index("Your new application is ready."))
+    Ok(views.html.index("Signature Verification System"))
   }
 
-  def enrollement = Action {
-    Ok(views.html.enrollement())
+  def javascriptRoutes = Action { implicit request =>
+    import routes.javascript._
+    Ok(
+      Routes.javascriptRouter("jsRoutes")(
+        routes.javascript.Enrollment.enroll
+      )).as("text/javascript")
   }
-
 }
