@@ -1,4 +1,4 @@
-function signatureCanvas(element) {
+function signatureCanvas(element, send, done, proba) {
 
   this.canvas = element[0];
   this.context = canvas.getContext('2d');
@@ -23,8 +23,9 @@ function signatureCanvas(element) {
   this.startSampling = function(freq) {
     console.log("Sampling frequency : "+freq+"Hz");
     console.log("Equivalent interval : "+(1.0/freq)*1000+"ms");
+    trace = [];
     this.sampler = setInterval(sample, (1.0/freq)*1000);
-    this.timeout = setInterval(timeout, 10000);
+    //this.timeout = setTimeout(timeout, 10000);
   };
 
   this.sample = function() {
@@ -32,31 +33,52 @@ function signatureCanvas(element) {
     if(painting) {
       trace.push({x : penPosition.x, y : penPosition.y, t : t});
     } else {
-      trace.push({x : -1, y : -1, t : t});
+      //trace.push({x : -1, y : -1, t : t});
     }
   };
 
-  this.timeout = function() {
+  this.sendSign = function() {
     clearInterval(sampler);
-    clearInterval(timeout);
+    //clearTimeout(timeout);
     signatureStarted = false;
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.clearRect(0, 0, canvas.width, canvas.height);
     $.ajax({
-      url: jsRoutes.controllers.Enrollment.enroll().url,
+      url: jsRoutes.controllers.Enrollment.addEnrollmentSignature().url,
       type: "POST",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: JSON.stringify({
         name: "Aubry",
         signature: trace
-      }),
-      success: function(text)
-         {
-            alert(text);
-         }
+      })
     });
   };
+
+  this.findProba = function() {
+    clearInterval(sampler);
+    //clearTimeout(timeout);
+    signatureStarted = false;
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    $.ajax({
+      url: jsRoutes.controllers.Enrollment.probaSignature().url,
+      type: "POST",
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      data: JSON.stringify({
+        name: "Aubry",
+        signature: trace
+      })
+    });
+  };
+
+  this.enroll = function() {
+    $.ajax({
+      url: jsRoutes.controllers.Enrollment.enroll().url,
+      type: "POST"
+    });
+  }
 
   this.canvasListeners = function(signals, listener, add) {
     var events = signals.split(' ');
@@ -135,4 +157,8 @@ function signatureCanvas(element) {
     'mouseup touchend touchcancel touchleave',
     onStopInteraction, true
   );
+
+  send.click(sendSign);
+  done.click(enroll);
+  proba.click(findProba);
 }

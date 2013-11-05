@@ -10,11 +10,13 @@
     </head>
     <body>
     	<canvas id="signPad" width="960" height="640" style="border:1px solid #000000;"></canvas>
-		<div id="done">
-  			<a href="#">Done</a>
+		<div id="buttons">
+            <a href="#" id="new">New</a>
+  			<a href="#" id="done">Done</a>
+            <a href="#" id="proba">Proba</a>
 		</div>
 		<script>
-			var signPad = signatureCanvas($("#signPad"));
+			var signPad = signatureCanvas($("#signPad"), $("#new"), $("#done"), $("#proba"));
 		</script>
     </body>
 </html>

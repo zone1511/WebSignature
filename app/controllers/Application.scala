@@ -13,7 +13,9 @@ object Application extends Controller {
     import routes.javascript._
     Ok(
       Routes.javascriptRouter("jsRoutes")(
-        routes.javascript.Enrollment.enroll
+        routes.javascript.Enrollment.addEnrollmentSignature,
+        routes.javascript.Enrollment.enroll,
+        routes.javascript.Enrollment.probaSignature
       )).as("text/javascript")
   }
 }

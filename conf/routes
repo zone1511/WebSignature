@@ -8,6 +8,8 @@ GET     /                           controllers.Application.index
 # Enrollement
 GET     /enrollment                 controllers.Enrollment.enrollmentForm
 POST    /enroll                     controllers.Enrollment.enroll
+POST    /addEnrollmentSignature     controllers.Enrollment.addEnrollmentSignature
+POST    /probaSignature             controllers.Enrollment.probaSignature
 
 # Javascript routing
 GET     /javascriptRoutes           controllers.Application.javascriptRoutes
