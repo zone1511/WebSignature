@@ -1,4 +1,4 @@
-function signatureCanvas(element, send, done, proba) {
+function signatureCanvas(element, add_button, enroll_button, check_button, clear_button) {
 
   this.canvas = element[0];
   this.context = canvas.getContext('2d');
@@ -13,7 +13,7 @@ function signatureCanvas(element, send, done, proba) {
   this.context.lineWidth = 5;
   this.context.lineJoin = 'round';
   this.context.lineCap = 'round';
-  this.context.strokeStyle = 'blue';
+  this.context.strokeStyle = '#072847';
 
   this.sampler = null;
   this.timeout = null;
@@ -38,11 +38,6 @@ function signatureCanvas(element, send, done, proba) {
   };
 
   this.sendSign = function() {
-    clearInterval(sampler);
-    //clearTimeout(timeout);
-    signatureStarted = false;
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, canvas.width, canvas.height);
     $.ajax({
       url: jsRoutes.controllers.Enrollment.addEnrollmentSignature().url,
       type: "POST",
@@ -52,15 +47,15 @@ function signatureCanvas(element, send, done, proba) {
         name: "Aubry",
         signature: trace
       })
+    }).done(function() {
+      alert("Success.");
+    }).fail(function() {
+      alert("Sorry. Server unavailable. ");
     });
+    clear();
   };
 
   this.findProba = function() {
-    clearInterval(sampler);
-    //clearTimeout(timeout);
-    signatureStarted = false;
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, canvas.width, canvas.height);
     $.ajax({
       url: jsRoutes.controllers.Enrollment.probaSignature().url,
       type: "POST",
@@ -70,13 +65,22 @@ function signatureCanvas(element, send, done, proba) {
         name: "Aubry",
         signature: trace
       })
+    }).done(function() {
+      alert("Success.");
+    }).fail(function() {
+      alert("Sorry. Server unavailable. ");
     });
+    clear();
   };
 
   this.enroll = function() {
     $.ajax({
       url: jsRoutes.controllers.Enrollment.enroll().url,
       type: "POST"
+    }).done(function() {
+      alert("Success.");
+    }).fail(function() {
+      alert("Sorry. Server unavailable. ");
     });
   }
 
@@ -143,6 +147,15 @@ function signatureCanvas(element, send, done, proba) {
     );
   };
 
+  this.clear = function() {
+    clearInterval(sampler);
+    //clearTimeout(timeout);
+    signatureStarted = false;
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    this.trace = [];
+  }
+
   canvasListeners(
     'mousemove touchmove',
     updatePenPosition, true
@@ -158,7 +171,8 @@ function signatureCanvas(element, send, done, proba) {
     onStopInteraction, true
   );
 
-  send.click(sendSign);
-  done.click(enroll);
-  proba.click(findProba);
+  add_button.click(sendSign);
+  enroll_button.click(enroll);
+  check_button.click(findProba);
+  clear_button.click(clear);
 }

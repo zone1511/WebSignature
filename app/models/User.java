@@ -14,11 +14,11 @@ public class User {
   }
 
   public void enroll(List<List<double[]>> traces) {
-    signatureModel = new SignatureModel(traces);
+    //signatureModel = new SignatureModel(traces);
   }
 
   public void probability(List<double[]> trace) {
-    signatureModel.probability(trace);
+    //signatureModel.probability(trace);
 
   }
 }

@@ -4,10 +4,16 @@ import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.concurrent._
+
 import models.SignatureModel
 import be.ac.ulg.montefiore.run.jahmm._
+
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.duration._
+import scala.concurrent._
 
 object Enrollment extends Controller {
 
@@ -18,7 +24,7 @@ object Enrollment extends Controller {
   
   var signatures = ListBuffer[ListBuffer[Array[Double]]]()
 
-  var model : SignatureModel = null
+  var model : SignatureModel = new SignatureModel(4, 3)
 
   type Position = (Double, Double, Double)
 
@@ -38,8 +44,6 @@ object Enrollment extends Controller {
     request.body.validate[(String, ListBuffer[Position])].map{ 
       case (name, signature) => {
         val signArray : ListBuffer[Array[Double]] = signature.map(x => Array(x._1, x._2))
-        //signatures ::= signArray
-        //signatures = ListBuffer[ListBuffer[Array[Double]]]()
         signatures += signArray
 
         Ok(
@@ -57,13 +61,16 @@ object Enrollment extends Controller {
     request.body.validate[(String, ListBuffer[Position])].map{ 
       case (name, signature) => {
         val signArray : ListBuffer[Array[Double]] = signature.map(x => Array(x._1, x._2))
-        //signatures ::= signArray
         val aSign : java.util.List[Array[Double]] = new java.util.LinkedList(signArray.map(y => y.map(z => z)))
-        val probab = model.probability(aSign)
+        val probab = Future{ model.probability(aSign) }
 
-        Ok(
-        "Hello " + name +
-        ", number of sampled points : "+probab).as("text/html");
+        val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 20.seconds)
+        Async {
+          Future.firstCompletedOf(Seq(probab, timeoutFuture)).map { 
+            case i: Double => Ok("Probability : "+i)
+            case t: String => InternalServerError(t)
+          }  
+        }
       }
     }.recoverTotal{
       e => BadRequest("Detected error:"+ JsError.toFlatJson(e))
@@ -72,11 +79,15 @@ object Enrollment extends Controller {
 
   def enroll = Action {
     Logger.info("Enrolling ...")
-    //val aSign : java.util.List[java.util.List[Array[Double]]] = new java.util.LinkedList(signatures.map(x => new java.util.LinkedList(x.map(y => new Array[java.lang.Double](y)))))
-
     val aSign : java.util.List[java.util.List[Array[Double]]] = new java.util.LinkedList(signatures.map(x => new java.util.LinkedList(x.map(y => y.map(z => z)))))
-    model = new SignatureModel(aSign)
-    Ok("Hi !")
+    val train = Future{ model.train(aSign) }
+    val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 120.seconds)
+    Async {
+      Future.firstCompletedOf(Seq(train, timeoutFuture)).map { 
+        case i: Boolean => Ok("Enrollment successful")
+        case t: String => InternalServerError(t)
+      }  
+    }
   }
 
 }

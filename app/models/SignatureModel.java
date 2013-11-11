@@ -16,26 +16,22 @@ public class SignatureModel {
 
   private Hmm<ObservationVector> hiddenMarkovModel;
 
-  private final int nbStates = 2;
-  private final int nbGaussians = 1;
+  private final int nbStates;
+  private final int nbGaussians;
 
-  public SignatureModel(List<List<double[]>> traces) {
+  public SignatureModel(int nbStates, int nbGaussians) {
+    this.nbStates = nbStates;
+    this.nbGaussians = nbGaussians;
+  }
+
+  public boolean train(List<List<double[]>> traces) {
     computeParameters(traces);
     List<List<ObservationVector>> tracesNormalized = normalize(traces);
-    //List<List<ObservationReal>> tracesNormalized = traces;
 
-    //List<List<ObservationReal>> tracesNormalized = new ArrayList<List<ObservationReal>>();
-    //List<ObservationReal> tra = new ArrayList<ObservationReal>();
-
-    //tra.add(new ObservationReal(615));
-    //tra.add(new ObservationReal(152));
-    //tra.add(new ObservationReal(14));
-    //tracesNormalized.add(tra);
     System.out.println("means = "+Arrays.toString(mean));
     System.out.println("std = "+Arrays.toString(std));
     System.out.println("Traces : "+tracesNormalized.toString());
 
-    //Logger.info(traces.toString());
     KMeansLearner<ObservationVector> kml =
       new KMeansLearner(
         nbStates,
@@ -62,7 +58,7 @@ public class SignatureModel {
     hiddenMarkovModel.setAij(nbStates-1,nbStates-1, 0.5);
     System.out.println(hiddenMarkovModel.toString());
 
-    train(tracesNormalized);
+    train_BW(tracesNormalized);
     System.out.println(hiddenMarkovModel.toString());
     System.out.println("Traces : "+tracesNormalized.get(0).toString());
     System.out.println("Probability : "+hiddenMarkovModel.lnProbability(tracesNormalized.get(0)));
@@ -73,9 +69,10 @@ public class SignatureModel {
     System.out.println("Traces : "+tracesNormalized.get(2).toString());
     System.out.println("Probability : "+hiddenMarkovModel.lnProbability(tracesNormalized.get(2)));
     System.out.println("State sequence : "+Arrays.toString(hiddenMarkovModel.mostLikelyStateSequence(tracesNormalized.get(2))));
+    return true;
   }
 
-  public void train(List<List<ObservationVector>> normalizedTraces) {
+  private void train_BW(List<List<ObservationVector>> normalizedTraces) {
     System.out.println("Training...");
     BaumWelchScaledLearner bwl =
       new BaumWelchScaledLearner();
@@ -94,7 +91,7 @@ public class SignatureModel {
     System.out.println("Traces : "+normalizedSignature.toString());
     System.out.println("Probability : "+hiddenMarkovModel.lnProbability(normalizedSignature));
     System.out.println("State sequence : "+Arrays.toString(hiddenMarkovModel.mostLikelyStateSequence(normalizedSignature)));
-    return hiddenMarkovModel.probability(normalizedSignature);
+    return hiddenMarkovModel.lnProbability(normalizedSignature);
   }
 
   private List<List<ObservationVector>> normalize(List<List<double[]>> signatures) {

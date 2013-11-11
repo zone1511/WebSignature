@@ -7,16 +7,26 @@
         <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/signatureCanvas.js")" type="text/javascript"></script>
         <script src="@routes.Application.javascriptRoutes" type="text/javascript"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     </head>
     <body>
-    	<canvas id="signPad" width="960" height="640" style="border:1px solid #000000;"></canvas>
-		<div id="buttons">
-            <a href="#" id="new">New</a>
-  			<a href="#" id="done">Done</a>
-            <a href="#" id="proba">Proba</a>
+    	<canvas id="signPad" width="640px" height="300px"></canvas>
+		<div id="menu">
+            <li><a href="#" id="clear"><div class="menu_text">Clear</div></a></li>
+            <li><a href="#" id="add"><div class="menu_text">New</div></a></li>
+  			<li><a href="#" id="enroll"><div class="menu_text">Enroll</div></a></li>
+            <li><a href="#" id="check"><div class="menu_text">Check</div></a></li>
 		</div>
 		<script>
-			var signPad = signatureCanvas($("#signPad"), $("#new"), $("#done"), $("#proba"));
+            var green = 13;
+            var canvas = $("#signPad")[0];
+            canvas.width  = window.innerWidth*0.8;
+            canvas.height = window.innerHeight;
+            $("#add").click(function() {
+                green = green+20;
+                $("#enroll").css("background-color","rgb(13,"+green+",13)");
+            });
+			var signPad = signatureCanvas($("#signPad"), $("#add"), $("#enroll"), $("#check"), $("#clear"));
 		</script>
     </body>
 </html>
