@@ -42,6 +42,7 @@
                 $("#enrollment_pending").css( "display", "none");
                 $("#check").css("background-color","rgb(13,180,13)");
                 $("#enroll").css("background-color","rgb(13,13,13)");
+                green = 13;
             }
             var check_success = function(proba) {
                 $("#enrollment_pending").css( "display", "none");
@@ -52,6 +53,7 @@
                 });
             }
             var error = function() {
+                green = 13;
                 $("#enrollment_pending").css( "display", "none");
                 $("#check_success").css( "display", "none");
                 $("#error").css( "display", "table");
