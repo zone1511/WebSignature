@@ -29,6 +29,7 @@
                 canvas.width  = window.innerWidth*0.8;
                 canvas.height = window.innerHeight;
             });
+
             var add_success = function() {
                 green = green+20;
                 $("#enroll").css("background-color","rgb(13,"+green+",13)");
@@ -44,6 +45,7 @@
                 $("#enroll").css("background-color","rgb(13,13,13)");
                 green = 13;
             }
+
             var check_success = function(proba) {
                 $("#enrollment_pending").css( "display", "none");
                 $("#check_success").text("Probability : "+proba);
@@ -52,6 +54,7 @@
                     $("#check_success").css( "display", "none");
                 });
             }
+
             var error = function() {
                 green = 13;
                 $("#enrollment_pending").css( "display", "none");
@@ -61,7 +64,19 @@
                     $("#error").css( "display", "none");
                 });
             }
-			var signPad = signatureCanvas($("#signPad"), $("#add"), $("#enroll"), $("#check"), $("#clear"), add_success, enrollment_pending, enrollment_success, check_success, error);
+            
+			var signPad = signatureCanvas(
+                $("#signPad"),
+                $("#add"),
+                $("#enroll"),
+                $("#check"),
+                $("#clear"),
+                add_success,
+                enrollment_pending,
+                enrollment_success,
+                check_success,
+                error
+            );
 		</script>
     </body>
 </html>

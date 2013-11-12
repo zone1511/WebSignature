@@ -32,11 +32,10 @@ body {
 }
 
 #menu a {
+  display: table;
   height:100%;
   width:100%;
-  border-bottom: 1px solid #393939;
   color: #ddd;
-  display: table;
   margin: 0;
   padding: 0;
   text-align:center;
@@ -54,7 +53,6 @@ body {
 
 #clear {
   background: #640101;
-  
 }
 #add {
   background: #2580a2;

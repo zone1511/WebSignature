@@ -43,11 +43,12 @@ object Enrollment extends Controller {
     Logger.info("Add enrollment signature")
     request.body.validate[(String, ListBuffer[Position])].map{ 
       case (name, signature) => {
-        val signArray : ListBuffer[Array[Double]] = signature.map(x => Array(x._1, x._2))
+        val signArray : ListBuffer[Array[Double]] = signature.map(x => Array(x._1, x._2, x._3))
         signatures += signArray
         Ok(Json.obj("name"->name,
           "sampledPoints"->signArray.size,
-          "nbSignature"->signatures.size))
+          "nbSignature"->signatures.size,
+          "signature"->signArray))
 
       }
     }.recoverTotal{
@@ -59,7 +60,7 @@ object Enrollment extends Controller {
     Logger.info("Test probab")
     request.body.validate[(String, ListBuffer[Position])].map{ 
       case (name, signature) => {
-        val signArray : ListBuffer[Array[Double]] = signature.map(x => Array(x._1, x._2))
+        val signArray : ListBuffer[Array[Double]] = signature.map(x => Array(x._1, x._2, x._3))
         val aSign : java.util.List[Array[Double]] = new java.util.LinkedList(signArray.map(y => y.map(z => z)))
         val probab = Future{ model.probability(aSign) }
 

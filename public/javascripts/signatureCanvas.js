@@ -124,6 +124,8 @@ function signatureCanvas(element, add_button, enroll_button, check_button, clear
   this.onInteraction = function(event) {
     event.preventDefault();
 
+    trace.push({x : -1, y : -1, t : -1});
+
     if(!signatureStarted) {
       start = new Date().getTime();
       startSampling(100);

@@ -12,7 +12,7 @@ public class SignatureModel {
   private double[] mean;
   private double[] std;
 
-  private int nbFeatures = 2;
+  private int nbFeatures = 5;
 
   private Hmm<ObservationVector> hiddenMarkovModel;
 
@@ -24,9 +24,55 @@ public class SignatureModel {
     this.nbGaussians = nbGaussians;
   }
 
+  private List<double[]> extractFeatures(List<double[]> signature) {
+    List<double[]> featureVectors = new ArrayList();
+    for (int i=0; i<signature.size(); i++) {
+      double[] sample = signature.get(i);
+      double[] features = new double[nbFeatures];
+      //Sample value [-1, -1, -1] is only here to indicate a discontinuity.
+      if (sample[0] != -1) {
+        features[0] = sample[0];
+        features[1] = sample[1];
+        features[2] = (getRelativeSample(i,1,signature)[0]-getRelativeSample(i,-1,signature)[0])/(getRelativeSample(i,1,signature)[2]-getRelativeSample(i,-1,signature)[2]);
+        features[3] = (getRelativeSample(i,1,signature)[1]-getRelativeSample(i,-1,signature)[1])/(getRelativeSample(i,1,signature)[2]-getRelativeSample(i,-1,signature)[2]);
+        features[4] = Math.sqrt(Math.pow(features[2],2)+Math.pow(features[3],2));
+        featureVectors.add(features);
+      }
+    }
+    return featureVectors;
+  }
+
+
+  private double[] getRelativeSample(int startIndex, int offset, List<double[]> signature) {
+    int finalIndex = startIndex+offset;
+    /*if (finalIndex < 0 || finalIndex >= signature.size()) {
+      double[] defaultSample = new double[nbFeatures];
+      Arrays.fill(defaultSample, 0.);
+      return defaultSample;
+    }*/
+    if (finalIndex < 0)
+      return signature.get(0);
+    if (finalIndex >= signature.size())
+      return signature.get(signature.size()-1);
+    // Handle discontinuities
+    int i=startIndex;
+    int signOffset = (int) Math.signum(offset);
+    while (signature.get(i)[0] != -1 && i != finalIndex) {
+      i += signOffset;
+    }
+    return signature.get(i);
+  }
+
+
   public boolean train(List<List<double[]>> traces) {
-    computeParameters(traces);
-    List<List<ObservationVector>> tracesNormalized = normalize(traces);
+
+    List<List<double[]>> tracesFeatures = new ArrayList();
+    for(List<double[]> samples : traces) {
+      tracesFeatures.add(extractFeatures(samples));
+    }
+
+    computeParameters(tracesFeatures);
+    List<List<ObservationVector>> tracesNormalized = normalize(tracesFeatures);
 
     System.out.println("means = "+Arrays.toString(mean));
     System.out.println("std = "+Arrays.toString(std));
@@ -85,7 +131,7 @@ public class SignatureModel {
   }
 
   public double probability(List<double[]> trace) {
-    List<ObservationVector> normalizedSignature = normalize_sign(trace);
+    List<ObservationVector> normalizedSignature = normalize_sign(extractFeatures(trace));
     System.out.println("Probab");
     System.out.println(hiddenMarkovModel.toString());
     System.out.println("Traces : "+normalizedSignature.toString());
