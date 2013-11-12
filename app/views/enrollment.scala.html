@@ -10,6 +10,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     </head>
     <body>
+        <div id="enrollment_pending" class="info"><div class="info_text">Enrollment, please wait...</div></div>
+        <div id="check_success" class="info"><div class="info_text"></div></div>
+        <div id="error" class="info"><div class="info_text">Oops...</div></div>
     	<canvas id="signPad" width="640px" height="300px"></canvas>
 		<div id="menu">
             <li><a href="#" id="clear"><div class="menu_text">Clear</div></a></li>
@@ -22,11 +25,37 @@
             var canvas = $("#signPad")[0];
             canvas.width  = window.innerWidth*0.8;
             canvas.height = window.innerHeight;
-            $("#add").click(function() {
+            var add_success = function() {
                 green = green+20;
                 $("#enroll").css("background-color","rgb(13,"+green+",13)");
-            });
-			var signPad = signatureCanvas($("#signPad"), $("#add"), $("#enroll"), $("#check"), $("#clear"));
+            }
+
+            var enrollment_pending = function() {
+                $("#enrollment_pending").css( "display", "table");
+            }
+
+            var enrollment_success = function() {
+                $("#enrollment_pending").css( "display", "none");
+                $("#check").css("background-color","rgb(13,180,13)");
+                $("#enroll").css("background-color","rgb(13,13,13)");
+            }
+            var check_success = function(proba) {
+                $("#enrollment_pending").css( "display", "none");
+                $("#check_success").text("Probability : "+proba);
+                $("#check_success").css( "display", "table");
+                $("#check_success").click(function() {
+                    $("#check_success").css( "display", "none");
+                });
+            }
+            var error = function() {
+                $("#enrollment_pending").css( "display", "none");
+                $("#check_success").css( "display", "none");
+                $("#error").css( "display", "table");
+                $("#error").click(function() {
+                    $("#error").css( "display", "none");
+                });
+            }
+			var signPad = signatureCanvas($("#signPad"), $("#add"), $("#enroll"), $("#check"), $("#clear"), add_success, enrollment_pending, enrollment_success, check_success, error);
 		</script>
     </body>
 </html>

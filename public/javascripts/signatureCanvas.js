@@ -1,4 +1,4 @@
-function signatureCanvas(element, add_button, enroll_button, check_button, clear_button) {
+function signatureCanvas(element, add_button, enroll_button, check_button, clear_button, add_success, enrollment_pending, enrollment_success, check_success, error) {
 
   this.canvas = element[0];
   this.context = canvas.getContext('2d');
@@ -48,9 +48,9 @@ function signatureCanvas(element, add_button, enroll_button, check_button, clear
         signature: trace
       })
     }).done(function() {
-      alert("Success.");
+      add_success();
     }).fail(function() {
-      alert("Sorry. Server unavailable. ");
+      error();
     });
     clear();
   };
@@ -65,22 +65,23 @@ function signatureCanvas(element, add_button, enroll_button, check_button, clear
         name: "Aubry",
         signature: trace
       })
-    }).done(function() {
-      alert("Success.");
+    }).done(function(data) {
+      check_success(data.probability);
     }).fail(function() {
-      alert("Sorry. Server unavailable. ");
+      error();
     });
     clear();
   };
 
   this.enroll = function() {
+    enrollment_pending();
     $.ajax({
       url: jsRoutes.controllers.Enrollment.enroll().url,
       type: "POST"
     }).done(function() {
-      alert("Success.");
+      enrollment_success();
     }).fail(function() {
-      alert("Sorry. Server unavailable. ");
+      error();
     });
   }
 

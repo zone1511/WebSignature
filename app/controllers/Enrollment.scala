@@ -45,11 +45,10 @@ object Enrollment extends Controller {
       case (name, signature) => {
         val signArray : ListBuffer[Array[Double]] = signature.map(x => Array(x._1, x._2))
         signatures += signArray
+        Ok(Json.obj("name"->name,
+          "sampledPoints"->signArray.size,
+          "nbSignature"->signatures.size))
 
-        Ok(
-        "Hello " + name +
-        ", number of sampled points : "+signArray.size +
-        ", number of signatures : "+signature).as("text/html");
       }
     }.recoverTotal{
       e => BadRequest("Detected error:"+ JsError.toFlatJson(e))
@@ -67,7 +66,7 @@ object Enrollment extends Controller {
         val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 20.seconds)
         Async {
           Future.firstCompletedOf(Seq(probab, timeoutFuture)).map { 
-            case i: Double => Ok("Probability : "+i)
+            case i: Double => Ok(Json.obj("probability"->i))
             case t: String => InternalServerError(t)
           }  
         }
@@ -80,6 +79,9 @@ object Enrollment extends Controller {
   def enroll = Action {
     Logger.info("Enrolling ...")
     val aSign : java.util.List[java.util.List[Array[Double]]] = new java.util.LinkedList(signatures.map(x => new java.util.LinkedList(x.map(y => y.map(z => z)))))
+    
+    signatures = ListBuffer[ListBuffer[Array[Double]]]()
+    
     val train = Future{ model.train(aSign) }
     val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 120.seconds)
     Async {
