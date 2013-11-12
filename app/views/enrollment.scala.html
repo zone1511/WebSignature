@@ -25,6 +25,10 @@
             var canvas = $("#signPad")[0];
             canvas.width  = window.innerWidth*0.8;
             canvas.height = window.innerHeight;
+            $(window).resize(function(){
+                canvas.width  = window.innerWidth*0.8;
+                canvas.height = window.innerHeight;
+            });
             var add_success = function() {
                 green = green+20;
                 $("#enroll").css("background-color","rgb(13,"+green+",13)");
