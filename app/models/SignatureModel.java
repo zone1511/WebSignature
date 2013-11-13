@@ -54,13 +54,10 @@ public class SignatureModel {
       return signature.get(0);
     if (finalIndex >= signature.size())
       return signature.get(signature.size()-1);
-    // Handle discontinuities
-    int i=startIndex;
-    int signOffset = (int) Math.signum(offset);
-    while (signature.get(i)[0] != -1 && i != finalIndex) {
-      i += signOffset;
-    }
-    return signature.get(i);
+    double[] sample = signature.get(finalIndex);
+    if(sample[0] == -1)
+      return signature.get(startIndex);
+    return sample;
   }
 
 
@@ -131,6 +128,9 @@ public class SignatureModel {
   }
 
   public double probability(List<double[]> trace) {
+    for(double[] features : extractFeatures(trace)) {
+      System.out.println(Arrays.toString(features));
+    }
     List<ObservationVector> normalizedSignature = normalize_sign(extractFeatures(trace));
     System.out.println("Probab");
     System.out.println(hiddenMarkovModel.toString());
