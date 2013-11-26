@@ -11,6 +11,7 @@ public class SignatureModel {
 
   private double[] mean;
   private double[] std;
+  private double averageTrainingScore;
 
   private int nbFeatures = 5;
 
@@ -33,13 +34,27 @@ public class SignatureModel {
       if (sample[0] != -1) {
         features[0] = sample[0];
         features[1] = sample[1];
-        features[2] = (getRelativeSample(i,1,signature)[0]-getRelativeSample(i,-1,signature)[0])/(getRelativeSample(i,1,signature)[2]-getRelativeSample(i,-1,signature)[2]);
-        features[3] = (getRelativeSample(i,1,signature)[1]-getRelativeSample(i,-1,signature)[1])/(getRelativeSample(i,1,signature)[2]-getRelativeSample(i,-1,signature)[2]);
+        /*features[2] = (getRelativeSample(i,1,signature)[0]-getRelativeSample(i,-1,signature)[0])/(getRelativeSample(i,1,signature)[2]-getRelativeSample(i,-1,signature)[2]);
+        features[3] = (getRelativeSample(i,1,signature)[1]-getRelativeSample(i,-1,signature)[1])/(getRelativeSample(i,1,signature)[2]-getRelativeSample(i,-1,signature)[2]);*/
+        features[2] = (getRelativeSample(i,1,signature)[0]-getRelativeSample(i,-1,signature)[0])/2.;
+        features[3] = (getRelativeSample(i,1,signature)[1]-getRelativeSample(i,-1,signature)[1])/2.;
         features[4] = Math.sqrt(Math.pow(features[2],2)+Math.pow(features[3],2));
         featureVectors.add(features);
       }
     }
     return featureVectors;
+  }
+
+  private void regularizePosition(List<double[]> signature) {
+    double[] initialPosition = {signature.get(0)[0], signature.get(0)[1]};
+    //List<double[]> regularizedSignature = new ArrayList();
+    //double[] currentPosition = new double[2];
+    for(double[] position : signature) {
+      if(position[0] != -1) {
+        position[0] -= initialPosition[0];
+        position[1] -= initialPosition[1];
+      }
+    }
   }
 
 
@@ -62,9 +77,9 @@ public class SignatureModel {
 
 
   public boolean train(List<List<double[]>> traces) {
-
     List<List<double[]>> tracesFeatures = new ArrayList();
     for(List<double[]> samples : traces) {
+      regularizePosition(samples);
       tracesFeatures.add(extractFeatures(samples));
     }
 
@@ -102,6 +117,14 @@ public class SignatureModel {
     System.out.println(hiddenMarkovModel.toString());
 
     train_BW(tracesNormalized);
+
+    for(List<ObservationVector> trainingSignature : tracesNormalized) {
+      averageTrainingScore += hiddenMarkovModel.lnProbability(trainingSignature);
+    }
+    averageTrainingScore /= tracesNormalized.size();
+    System.out.println("Average training score : "+averageTrainingScore);
+
+    /*
     System.out.println(hiddenMarkovModel.toString());
     System.out.println("Traces : "+tracesNormalized.get(0).toString());
     System.out.println("Probability : "+hiddenMarkovModel.lnProbability(tracesNormalized.get(0)));
@@ -112,6 +135,7 @@ public class SignatureModel {
     System.out.println("Traces : "+tracesNormalized.get(2).toString());
     System.out.println("Probability : "+hiddenMarkovModel.lnProbability(tracesNormalized.get(2)));
     System.out.println("State sequence : "+Arrays.toString(hiddenMarkovModel.mostLikelyStateSequence(tracesNormalized.get(2))));
+    */
     return true;
   }
 
@@ -128,16 +152,20 @@ public class SignatureModel {
   }
 
   public double probability(List<double[]> trace) {
+    regularizePosition(trace);
     for(double[] features : extractFeatures(trace)) {
       System.out.println(Arrays.toString(features));
     }
     List<ObservationVector> normalizedSignature = normalize_sign(extractFeatures(trace));
+    double probability = hiddenMarkovModel.lnProbability(normalizedSignature);
+    double score = (averageTrainingScore/probability);
     System.out.println("Probab");
     System.out.println(hiddenMarkovModel.toString());
     System.out.println("Traces : "+normalizedSignature.toString());
-    System.out.println("Probability : "+hiddenMarkovModel.lnProbability(normalizedSignature));
+    System.out.println("Probability : "+probability);
+    System.out.println("Score : "+score);
     System.out.println("State sequence : "+Arrays.toString(hiddenMarkovModel.mostLikelyStateSequence(normalizedSignature)));
-    return hiddenMarkovModel.lnProbability(normalizedSignature);
+    return score;
   }
 
   private List<List<ObservationVector>> normalize(List<List<double[]>> signatures) {
