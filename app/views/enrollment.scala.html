@@ -47,9 +47,15 @@
             }
 
             var check_success = function(proba) {
-                $("#enrollment_pending").css( "display", "none");
-                $("#check_success").text("Probability : "+proba);
+                $("#enrollment_pending").css( "display", "none");    
                 $("#check_success").css( "display", "table");
+                if (proba > 0.8) {
+                    $("#check_success .info_text").text("OK ! Probability : "+proba);
+                    $("#check_success").css( "background-color", "green");
+                } else {
+                    $("#check_success .info_text").text("Nope ! Probability : "+proba);
+                    $("#check_success").css( "background-color", "red");
+                }
                 $("#check_success").click(function() {
                     $("#check_success").css( "display", "none");
                 });

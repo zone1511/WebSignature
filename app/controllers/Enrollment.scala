@@ -24,7 +24,7 @@ object Enrollment extends Controller {
   
   var signatures = ListBuffer[ListBuffer[Array[Double]]]()
 
-  var model : SignatureModel = new SignatureModel(4, 3)
+  var model : SignatureModel = new SignatureModel()
 
   type Position = (Double, Double, Double)
 

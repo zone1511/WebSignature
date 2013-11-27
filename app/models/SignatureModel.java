@@ -3,9 +3,15 @@ package models;
 import play.api.*;
 import be.ac.ulg.montefiore.run.jahmm.*;
 import be.ac.ulg.montefiore.run.jahmm.learn.*;
+import be.ac.ulg.montefiore.run.jahmm.io.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.io.Writer;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.StringReader;
+import java.io.IOException;
 
 public class SignatureModel {
 
@@ -13,16 +19,14 @@ public class SignatureModel {
   private double[] std;
   private double averageTrainingScore;
 
-  private int nbFeatures = 5;
-
   private Hmm<ObservationVector> hiddenMarkovModel;
 
-  private final int nbStates;
-  private final int nbGaussians;
+  private int nbFeatures = 5;
 
-  public SignatureModel(int nbStates, int nbGaussians) {
-    this.nbStates = nbStates;
-    this.nbGaussians = nbGaussians;
+  private final int nbStates = 4;
+  private final int nbGaussians = 3;
+
+  public SignatureModel() {
   }
 
   private List<double[]> extractFeatures(List<double[]> signature) {
@@ -124,6 +128,11 @@ public class SignatureModel {
     averageTrainingScore /= tracesNormalized.size();
     System.out.println("Average training score : "+averageTrainingScore);
 
+    System.out.println(hiddenMarkovModel.toString());
+    String sHMM = serializeHmm();
+    readHmm(sHMM);
+    //System.out.println(serializeHmm());
+    //System.out.println(hiddenMarkovModel.toString());
     /*
     System.out.println(hiddenMarkovModel.toString());
     System.out.println("Traces : "+tracesNormalized.get(0).toString());
@@ -261,6 +270,27 @@ public class SignatureModel {
     return std;
   }
 
+  private String serializeHmm(){
+    HmmWriter hmmWriter = new HmmWriter();
+    Writer writer = new StringWriter();
+    OpdfMultiGaussianMixtureWriter oPdfWriter = new OpdfMultiGaussianMixtureWriter();
+    try {
+      hmmWriter.write(writer, oPdfWriter, hiddenMarkovModel);
+    } catch (IOException e) {
+      System.out.println("Oops ! An exception occured while saving the HMM.");
+    }
+    return writer.toString();
+  }
 
+  private void readHmm(String hmm){
+    HmmReader hmmReader = new HmmReader();
+    Reader reader = new StringReader(hmm);
+    OpdfMultiGaussianMixtureReader oPdfReader = new OpdfMultiGaussianMixtureReader();
+    try {
+      hiddenMarkovModel = hmmReader.read(reader, oPdfReader);
+    } catch (Exception e) {
+      System.out.println("Oops ! An exception occured while reading the HMM.");
+    }
+  }
 }
 
