@@ -7,6 +7,7 @@ GET     /                           controllers.Application.index
 
 # Enrollement
 GET     /enrollment                 controllers.Enrollment.enrollmentForm
+GET     /verification               controllers.Enrollment.verificationForm
 POST    /enroll                     controllers.Enrollment.enroll
 POST    /addEnrollmentSignature     controllers.Enrollment.addEnrollmentSignature
 POST    /probaSignature             controllers.Enrollment.probaSignature

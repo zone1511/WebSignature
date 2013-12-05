@@ -12,22 +12,52 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.StringReader;
 import java.io.IOException;
+import org.apache.commons.lang.*;
 
+import play.db.ebean.*;
+import play.data.validation.Constraints.*;
+
+import javax.persistence.*;
+
+@Entity
 public class SignatureModel {
 
-  private double[] mean;
-  private double[] std;
-  private double averageTrainingScore;
+  @Id
+  public Long id;
 
-  private Hmm<ObservationVector> hiddenMarkovModel;
+  //Put in new class and use interface ScalarTypeConverter<B,S>
+  @Column(columnDefinition = "TEXT")
+  public String hmm;
+  // VERY UGLY CHANGE THIS ASAP :
+  public double meanFeature1;
+  public double meanFeature2;
+  public double meanFeature3;
+  public double meanFeature4;
+  public double meanFeature5;
+  public double stdFeature1;
+  public double stdFeature2;
+  public double stdFeature3;
+  public double stdFeature4;
+  public double stdFeature5;
 
+  public double averageTrainingScore;
+  @Transient
   private int nbFeatures = 5;
 
-  private final int nbStates = 4;
-  private final int nbGaussians = 3;
+  @Transient
+  public double[] mean = {1,2,3,4,5};
+  @Transient
+  public double[] std = new double[nbFeatures];
 
-  public SignatureModel() {
-  }
+  @Transient
+  private Hmm<ObservationVector> hiddenMarkovModel;
+
+
+
+  @Transient
+  private final int nbStates = 4;
+  @Transient
+  private final int nbGaussians = 3;
 
   private List<double[]> extractFeatures(List<double[]> signature) {
     List<double[]> featureVectors = new ArrayList();
@@ -127,11 +157,14 @@ public class SignatureModel {
     }
     averageTrainingScore /= tracesNormalized.size();
     System.out.println("Average training score : "+averageTrainingScore);
+    //TODO remove this line
+    hmm = getHiddenMarkovModel();
+    setValues();
 
-    System.out.println(hiddenMarkovModel.toString());
-    String sHMM = serializeHmm();
-    readHmm(sHMM);
-    //System.out.println(serializeHmm());
+    //System.out.println(hiddenMarkovModel.toString());
+    //String sHMM = getHmm();
+    //readHmm(sHMM);
+    //System.out.println(getHmm());
     //System.out.println(hiddenMarkovModel.toString());
     /*
     System.out.println(hiddenMarkovModel.toString());
@@ -161,6 +194,10 @@ public class SignatureModel {
   }
 
   public double probability(List<double[]> trace) {
+    //TODO remove this line
+    setHiddenMarkovModel(hmm);
+    getValues();
+    
     regularizePosition(trace);
     for(double[] features : extractFeatures(trace)) {
       System.out.println(Arrays.toString(features));
@@ -270,7 +307,7 @@ public class SignatureModel {
     return std;
   }
 
-  private String serializeHmm(){
+  public String getHiddenMarkovModel(){
     HmmWriter hmmWriter = new HmmWriter();
     Writer writer = new StringWriter();
     OpdfMultiGaussianMixtureWriter oPdfWriter = new OpdfMultiGaussianMixtureWriter();
@@ -282,7 +319,7 @@ public class SignatureModel {
     return writer.toString();
   }
 
-  private void readHmm(String hmm){
+  public void setHiddenMarkovModel(String hmm){
     HmmReader hmmReader = new HmmReader();
     Reader reader = new StringReader(hmm);
     OpdfMultiGaussianMixtureReader oPdfReader = new OpdfMultiGaussianMixtureReader();
@@ -291,6 +328,48 @@ public class SignatureModel {
     } catch (Exception e) {
       System.out.println("Oops ! An exception occured while reading the HMM.");
     }
+  }
+  /*
+  public List<Double> getMeans(){
+    return Arrays.asList(ArrayUtils.toObject(mean));
+  }
+
+  public List<Double> getStds(){
+    return Arrays.asList(ArrayUtils.toObject(std));
+  }
+
+  public void setMeans(List<Double> out) {
+    mean = ArrayUtils.toPrimitive(out.toArray(new Double[out.size()]));
+  }
+
+  public void setStds(List<Double> out) {
+    std = ArrayUtils.toPrimitive(out.toArray(new Double[out.size()]));
+  }*/
+// VERY UGLY CHANGE THIS ASAP :
+  public void setValues() {
+    meanFeature1 = mean[0];
+    meanFeature2 = mean[1];
+    meanFeature3 = mean[2];
+    meanFeature4 = mean[3];
+    meanFeature5 = mean[4];
+    stdFeature1 = std[0];
+    stdFeature2 = std[1];
+    stdFeature3 = std[2];
+    stdFeature4 = std[3];
+    stdFeature5 = std[4];
+  }
+
+  public void getValues() {
+    mean[0] = meanFeature1;
+    mean[1] = meanFeature2;
+    mean[2] = meanFeature3;
+    mean[3] = meanFeature4;
+    mean[4] = meanFeature5;
+    std[0] = stdFeature1;
+    std[1] = stdFeature2;
+    std[2] = stdFeature3;
+    std[3] = stdFeature4;
+    std[4] = stdFeature5;
   }
 }
 

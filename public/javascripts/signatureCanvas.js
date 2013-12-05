@@ -1,4 +1,4 @@
-function signatureCanvas(element, add_button, enroll_button, check_button, clear_button, add_success, enrollment_pending, enrollment_success, check_success, error) {
+function signatureCanvas(element, add_button, enroll_button, check_button, clear_button, add_success, enrollment_pending, enrollment_success, check_success, error, username) {
 
   this.canvas = element[0];
   this.context = canvas.getContext('2d');
@@ -44,7 +44,7 @@ function signatureCanvas(element, add_button, enroll_button, check_button, clear
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: JSON.stringify({
-        name: "Aubry",
+        name: username.val(),
         signature: trace
       })
     }).done(function() {
@@ -62,7 +62,7 @@ function signatureCanvas(element, add_button, enroll_button, check_button, clear
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: JSON.stringify({
-        name: "Aubry",
+        name: username.val(),
         signature: trace
       })
     }).done(function(data) {
@@ -174,8 +174,17 @@ function signatureCanvas(element, add_button, enroll_button, check_button, clear
     onStopInteraction, true
   );
 
-  add_button.click(sendSign);
-  enroll_button.click(enroll);
-  check_button.click(findProba);
-  clear_button.click(clear);
+  //this should be in the views
+  if(add_button) {
+    add_button.click(sendSign);
+  }
+  if(enroll_button) {
+    enroll_button.click(enroll);
+  }
+  if(check_button) {
+    check_button.click(findProba);
+  }
+  if(clear_button) {
+    clear_button.click(clear);
+  }
 }

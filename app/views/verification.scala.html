@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Enrollement phase</title>
+        <title>Verification</title>
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
@@ -10,20 +10,19 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     </head>
     <body>
-        <div id="enrollment_pending" class="info"><div class="info_text">Enrollment, please wait...</div></div>
+        <div id="check_success" class="info"><div class="info_text"></div></div>
         <div id="error" class="info"><div class="info_text">Oops...</div></div>
         <div id="username" class="info"><div class="info_text">
             Username : <input type="text" name="username"><br>
             <button type="button" id="ok">Done</button>
         </div></div>
-    	<canvas id="signPad" width="640px" height="300px"></canvas>
-		<div id="menu">
+      <canvas id="signPad" width="640px" height="300px"></canvas>
+    <div id="menu">
             <li><a href="#" id="clear"><div class="menu_text">Clear</div></a></li>
-            <li><a href="#" id="add"><div class="menu_text">New</div></a></li>
-  			<li><a href="#" id="enroll"><div class="menu_text">Enroll</div></a></li>
+            <li><a href="#" id="check"><div class="menu_text">Verify</div></a></li>
             <li><a href="#" id="user"><div class="menu_text">User</div></a></li>
-		</div>
-		<script>
+    </div>
+    <script>
             var green = 13;
             var canvas = $("#signPad")[0];
             canvas.width  = window.innerWidth*0.8;
@@ -42,44 +41,42 @@
                 $("#username").css( "display", "none");
             });
 
-            var add_success = function() {
-                green = green+20;
-                $("#enroll").css("background-color","rgb(13,"+green+",13)");
+            var check_success = function(proba) { 
+                $("#check_success").css( "display", "table");
+                if (proba > 0.8) {
+                    $("#check_success .info_text").text("OK ! Probability : "+proba);
+                    $("#check_success").css( "background-color", "green");
+                } else {
+                    $("#check_success .info_text").text("Nope ! Probability : "+proba);
+                    $("#check_success").css( "background-color", "red");
+                }
+                $("#check_success").click(function() {
+                    $("#check_success").css( "display", "none");
+                });
             }
-
-            var enrollment_pending = function() {
-                $("#enrollment_pending").css( "display", "table");
-            }
-
-            var enrollment_success = function() {
-                $("#enrollment_pending").css( "display", "none");
-                $("#enroll").css("background-color","rgb(13,13,13)");
-                green = 13;
-            }
-
 
             var error = function() {
                 green = 13;
-                $("#enrollment_pending").css( "display", "none");
+                $("#check_success").css( "display", "none");
                 $("#error").css( "display", "table");
                 $("#error").click(function() {
                     $("#error").css( "display", "none");
                 });
             }
             
-			var signPad = signatureCanvas(
+      var signPad = signatureCanvas(
                 $("#signPad"),
-                $("#add"),
-                $("#enroll"),
                 null,
+                null,
+                $("#check"),
                 $("#clear"),
-                add_success,
-                enrollment_pending,
-                enrollment_success,
                 null,
+                null,
+                null,
+                check_success,
                 error,
                 $("input[name=username]")
             );
-		</script>
+    </script>
     </body>
 </html>
