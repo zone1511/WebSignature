@@ -1,5 +1,17 @@
 package models;
 
+import java.util.List;
+
+import be.ac.ulg.montefiore.run.jahmm.*;
+import be.ac.ulg.montefiore.run.jahmm.learn.*;
+import be.ac.ulg.montefiore.run.jahmm.io.*;
+
+import java.io.Writer;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.StringReader;
+import java.io.IOException;
+
 public class HiddenMarkovModel {
 
   private Hmm<ObservationVector> hiddenMarkovModel;

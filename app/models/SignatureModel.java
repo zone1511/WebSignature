@@ -1,17 +1,9 @@
 package models;
 
 import play.api.*;
-import be.ac.ulg.montefiore.run.jahmm.*;
-import be.ac.ulg.montefiore.run.jahmm.learn.*;
-import be.ac.ulg.montefiore.run.jahmm.io.*;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.io.Writer;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.StringReader;
-import java.io.IOException;
+
 import org.apache.commons.lang.*;
 
 import play.db.ebean.*;

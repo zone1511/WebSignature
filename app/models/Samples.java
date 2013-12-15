@@ -1,5 +1,7 @@
 package models.strucutres;
 
+import java.util.List;
+
 public class Samples extends VectorList {
 
   private List<double[]> vectorList;

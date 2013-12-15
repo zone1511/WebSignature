@@ -1,5 +1,7 @@
 package models;
 
+import java.util.List;
+
 //@Entity
 public class Signature {
 

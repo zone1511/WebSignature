@@ -1,5 +1,9 @@
 package models;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Features {
 
   private List<double[]> vectorList;
