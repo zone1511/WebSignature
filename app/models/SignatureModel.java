@@ -24,16 +24,18 @@ public class SignatureModel {
   @Id
   public Long id;
 
+  //@Lob
+  @Column(columnDefinition = "TEXT")
+  public HiddenMarkovModel hiddenMarkovModel;
+
+  public double averageTrainingScore;
+
   @CreatedTimestamp
   Timestamp cretime;
 
   @Version
   Timestamp updtime;
 
-  //Put in new class and use interface ScalarTypeConverter<B,S>
-  @Column(columnDefinition = "TEXT")
-  public String hmm;
-  
   // VERY UGLY CHANGE THIS ASAP :
   public double meanFeature1;
   public double meanFeature2;
@@ -46,19 +48,13 @@ public class SignatureModel {
   public double stdFeature4;
   public double stdFeature5;
 
-  public double averageTrainingScore;
-
-  @Transient
-  private int nbFeatures = 5;
-
   @Transient
   public double[] mean = {1,2,3,4,5};
   @Transient
   public double[] std = new double[nbFeatures];
 
   @Transient
-  private HiddenMarkovModel hiddenMarkovModel;
-
+  private final int nbFeatures = 5;
   @Transient
   private final int nbStates = 4;
   @Transient
@@ -85,7 +81,6 @@ public class SignatureModel {
     computeAverageTrainingScore(signatures);
 
     //TODO remove this line, use converters instead
-    hmm = getHiddenMarkovModel();
     setValues();
 
     return true;
@@ -105,7 +100,6 @@ public class SignatureModel {
 
   public double probability(Features signature) {
     //TODO remove this line
-    setHiddenMarkovModel(hmm);
     getValues();
     
     signature.normalize(mean, std);
@@ -142,14 +136,6 @@ public class SignatureModel {
     std[2] = stdFeature3;
     std[3] = stdFeature4;
     std[4] = stdFeature5;
-  }
-
-  public String getHiddenMarkovModel(){
-    return hiddenMarkovModel.getHiddenMarkovModel();
-  }
-
-  public void setHiddenMarkovModel(String hmm){
-    hiddenMarkovModel = new HiddenMarkovModel(hmm);
   }
 }
 

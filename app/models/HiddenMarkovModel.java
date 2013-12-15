@@ -4,17 +4,15 @@ import java.util.List;
 
 import be.ac.ulg.montefiore.run.jahmm.*;
 import be.ac.ulg.montefiore.run.jahmm.learn.*;
-import be.ac.ulg.montefiore.run.jahmm.io.*;
 
-import java.io.Writer;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.StringReader;
-import java.io.IOException;
 
 public class HiddenMarkovModel {
 
   private Hmm<ObservationVector> hiddenMarkovModel;
+
+  public HiddenMarkovModel(Hmm<ObservationVector> hiddenMarkovModel) {
+    this.hiddenMarkovModel = hiddenMarkovModel;
+  }
 
   public HiddenMarkovModel(
     List<List<ObservationVector>> observations,
@@ -51,10 +49,6 @@ public class HiddenMarkovModel {
     System.out.println(hiddenMarkovModel.toString());
   }
 
-  public HiddenMarkovModel(String hmm) {
-    this.setHiddenMarkovModel(hmm);
-  }
-
   public boolean train(List<List<ObservationVector>> observations) {
 
     System.out.println("Training...");
@@ -76,26 +70,7 @@ public class HiddenMarkovModel {
     return hiddenMarkovModel.lnProbability(observation);
   }
 
-  public String getHiddenMarkovModel(){
-    HmmWriter hmmWriter = new HmmWriter();
-    Writer writer = new StringWriter();
-    OpdfMultiGaussianMixtureWriter oPdfWriter = new OpdfMultiGaussianMixtureWriter();
-    try {
-      hmmWriter.write(writer, oPdfWriter, hiddenMarkovModel);
-    } catch (IOException e) {
-      System.out.println("Oops ! An exception occured while saving the HMM.");
-    }
-    return writer.toString();
-  }
-
-  public void setHiddenMarkovModel(String hmm){
-    HmmReader hmmReader = new HmmReader();
-    Reader reader = new StringReader(hmm);
-    OpdfMultiGaussianMixtureReader oPdfReader = new OpdfMultiGaussianMixtureReader();
-    try {
-      hiddenMarkovModel = hmmReader.read(reader, oPdfReader);
-    } catch (Exception e) {
-      System.out.println("Oops ! An exception occured while reading the HMM.");
-    }
+  public Hmm<ObservationVector> getHiddenMarkovModel(){
+    return hiddenMarkovModel;
   }
 }

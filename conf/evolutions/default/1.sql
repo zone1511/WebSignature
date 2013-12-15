@@ -5,7 +5,6 @@
 
 create table signature_model (
   id                        bigint not null,
-  hmm                       TEXT,
   mean_feature1             double,
   mean_feature2             double,
   mean_feature3             double,
@@ -17,6 +16,7 @@ create table signature_model (
   std_feature4              double,
   std_feature5              double,
   average_training_score    double,
+  hidden_markov_model       TEXT,
   cretime                   timestamp not null,
   updtime                   timestamp not null,
   constraint pk_signature_model primary key (id))
