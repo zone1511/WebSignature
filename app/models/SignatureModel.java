@@ -24,7 +24,9 @@ public class SignatureModel {
   @Id
   public Long id;
 
-  //@Lob
+  // @Lob might be necessary for bigger HMMs,
+  // but TEXT allows to inspect content of the HMM in the database
+  // See HiddenMarkovModelConverter
   @Column(columnDefinition = "TEXT")
   public HiddenMarkovModel hiddenMarkovModel;
 
