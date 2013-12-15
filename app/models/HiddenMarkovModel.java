@@ -51,9 +51,11 @@ public class HiddenMarkovModel {
     System.out.println(hiddenMarkovModel.toString());
   }
 
+  public HiddenMarkovModel(String hmm) {
+    this.setHiddenMarkovModel(hmm);
+  }
+
   public boolean train(List<List<ObservationVector>> observations) {
-    
-    init();
 
     System.out.println("Training...");
 

@@ -4,12 +4,18 @@ import play.api.*;
 import java.util.List;
 import java.util.Arrays;
 
+import be.ac.ulg.montefiore.run.jahmm.*;
+
 import org.apache.commons.lang.*;
 
 import play.db.ebean.*;
 import play.data.validation.Constraints.*;
 
 import javax.persistence.*;
+
+import com.avaje.ebean.annotation.CreatedTimestamp;
+
+import java.sql.Timestamp;
 
 
 @Entity
@@ -71,7 +77,7 @@ public class SignatureModel {
 
     List<List<ObservationVector>> trainingVectors = signatures.toObservationVectorLists();
 
-    hiddenMarkovModel = new HiddenMarkovModel(nbGaussians, nbFeatures, nbStates, trainingVectors);
+    hiddenMarkovModel = new HiddenMarkovModel(trainingVectors, nbGaussians, nbFeatures, nbStates);
 
     hiddenMarkovModel.train(trainingVectors);
 
@@ -142,8 +148,7 @@ public class SignatureModel {
   }
 
   public void setHiddenMarkovModel(String hmm){
-    hiddenMarkovModel = new HiddenMarkovModel(nbGaussians, nbFeatures);
-    hiddenMarkovModel.setHiddenMarkovModel(hmm);
+    hiddenMarkovModel = new HiddenMarkovModel(hmm);
   }
 }
 

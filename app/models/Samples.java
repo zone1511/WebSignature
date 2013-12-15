@@ -2,7 +2,7 @@ package models;
 
 import java.util.List;
 
-public class Samples extends VectorList {
+public class Samples {
 
   private List<double[]> vectorList;
 
@@ -39,6 +39,10 @@ public class Samples extends VectorList {
 
   public double[] get(int startIndex) {
     return this.get(startIndex, 0);
+  }
+
+  public int getSize() {
+    return vectorList.size();
   }
 
 }

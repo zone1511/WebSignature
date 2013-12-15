@@ -17,6 +17,8 @@ create table signature_model (
   std_feature4              double,
   std_feature5              double,
   average_training_score    double,
+  cretime                   timestamp not null,
+  updtime                   timestamp not null,
   constraint pk_signature_model primary key (id))
 ;
 
@@ -24,6 +26,8 @@ create table user (
   id                        bigint not null,
   name                      varchar(255),
   model_id                  bigint,
+  cretime                   timestamp not null,
+  updtime                   timestamp not null,
   constraint pk_user primary key (id))
 ;
 

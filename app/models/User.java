@@ -7,6 +7,10 @@ import java.util.*;
 import play.db.ebean.*;
 import play.data.validation.Constraints.*;
 
+import com.avaje.ebean.annotation.CreatedTimestamp;
+
+import java.sql.Timestamp;
+
 import javax.persistence.*;
 
 @Entity
@@ -38,7 +42,7 @@ public class User extends Model {
     for(List<double[]> rawSignature : rawSignatures) {
       Signature signature = new Signature(rawSignature, this, Signature.Type.TRAINING, "undefined");    
       // @TODO : Write in db here =)
-      trainingSet.add(signature);
+      trainingSet.addSignature(signature);
     }
 
     signatureModel = new SignatureModel();

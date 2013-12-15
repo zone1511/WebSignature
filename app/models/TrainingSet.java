@@ -1,5 +1,10 @@
 package models;
 
+import java.util.List;
+import java.util.ArrayList;
+
+import be.ac.ulg.montefiore.run.jahmm.*;
+
 public class TrainingSet {
 
   List<Features> trainingSignatures;
@@ -10,7 +15,7 @@ public class TrainingSet {
   private boolean normalized = false;
 
   public void addSignature(Signature signature){
-    trainingSignatures.add(signature);
+    trainingSignatures.add(signature.extractFeatures());
   }
 
   public double[] meanVector() {
@@ -38,7 +43,7 @@ public class TrainingSet {
       stdPerSignature.addVector(signature.stdVector());
     }
 
-    stds = computeMeanVector.meanVector();
+    stds = stdPerSignature.meanVector();
 
     return stds;
   }
@@ -49,7 +54,7 @@ public class TrainingSet {
 
     if (means == null)
       meanVector();
-    if (std == null)
+    if (stds == null)
       stdVector();
 
     for(Features signature : trainingSignatures) {
@@ -67,7 +72,7 @@ public class TrainingSet {
     List<List<ObservationVector>> signaturesSet = new ArrayList();
 
     for(Features signature : trainingSignatures) {
-      signatureSet.add(signature.toObservationVectorList());
+      signaturesSet.add(signature.toObservationVectorList());
     }
 
     return signaturesSet;

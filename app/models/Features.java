@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import be.ac.ulg.montefiore.run.jahmm.*;
+
 public class Features {
 
   private List<double[]> vectorList;
@@ -25,11 +27,10 @@ public class Features {
     vectorList = new ArrayList<double[]>();
     dimension = 5;
 
-    for (int i=0; i<sample.getSize(); i++) {
+    samples.setFromOrigin();
+    for (int i=0; i<samples.getSize(); i++) {
+
       double[] sample = samples.get(i);
-
-      sample.setFromOrigin();
-
       double[] features = new double[dimension];
 
       //Sample value [-1, -1, -1] is only here to indicate a discontinuity.
@@ -39,7 +40,7 @@ public class Features {
         features[2] = (samples.get(i,1)[0]-samples.get(i,-1)[0])/2.;
         features[3] = (samples.get(i,1)[1]-samples.get(i,-1)[1])/2.;
         features[4] = Math.sqrt(Math.pow(features[2],2)+Math.pow(features[3],2));
-        vectorList.addVector(features);
+        vectorList.add(features);
       }
     }
   }
@@ -48,8 +49,8 @@ public class Features {
     vectorList = new ArrayList();
   }
 
-  public void addVector(int i) {
-    vectorList.add(i);
+  public void addVector(double[] v) {
+    vectorList.add(v);
   }
 
   public double[] getVector(int i) {
@@ -86,10 +87,6 @@ public class Features {
     }
 
     return observationVectorList;
-  }
-
-  public List<ObservationVector> getNormalizedList() {
-    return getNormalizedList(meanVector(), stdVector());
   }
 
   public double[] meanVector() {
@@ -138,7 +135,7 @@ public class Features {
     if (stds != null)
       return stds;
     else
-      return std(meanVector());
+      return stdVector(meanVector());
 
   }
 
