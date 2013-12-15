@@ -6,3 +6,8 @@
 -Store signatures as well as device name, date etc... One table for TrainingSignatures one for TestSignatures.
 -username, buttons ... -> outside of signatureCanvas.js, should be just a library. Callbacks : ok but one for each method (not all of them at the begining), html elements : NO.
 -Better name management, only when adding
+-Global features :
+*Total duration
+*Number of pens up
+
+3 january : final presentation, 10h00
