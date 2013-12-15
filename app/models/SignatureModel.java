@@ -104,7 +104,7 @@ public class SignatureModel {
 
   }
 
-  public double probability(FeaturesList signature) {
+  public double probability(Features signature) {
     //TODO remove this line
     setHiddenMarkovModel(hmm);
     getValues();

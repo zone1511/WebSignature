@@ -25,17 +25,17 @@ public class Signature {
   //@CreatedTimestamp
   //Timestamp cretime;
 
-  public SamplesList samples; 
+  public Samples samples; 
 
   public Signature(List<double[]> vectorList, User owner, Type type, String device) {
-    this.samples = new SamplesList(vectorList);
+    this.samples = new Samples(vectorList);
     this.owner = owner;
     this.type = type;
     this.device = device;
   }
 
-  public FeatureList extractFeatures() {
-    return new FeaturesList(samples);
+  public Features extractFeatures() {
+    return new Features(samples);
   }
 
 }

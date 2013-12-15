@@ -1,6 +1,6 @@
 package models;
 
-public class FeaturesList {
+public class Features {
 
   private List<double[]> vectorList;
 
@@ -12,12 +12,12 @@ public class FeaturesList {
 
   private boolean normalized = false;
 
-  public FeaturesList(List<double[]> vectorList, int dimension) {
+  public Features(List<double[]> vectorList, int dimension) {
     this.vectorList = vectorList;
     this.dimension = dimension;
   }
 
-  public FeaturesList(SamplesList samples) {
+  public Features(Samples samples) {
     vectorList = new ArrayList<double[]>();
     dimension = 5;
 
@@ -40,7 +40,7 @@ public class FeaturesList {
     }
   }
 
-  public FeaturesList() {
+  public Features() {
     vectorList = new ArrayList();
   }
 

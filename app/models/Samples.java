@@ -1,10 +1,10 @@
 package models.strucutres;
 
-public class SamplesList extends VectorList {
+public class Samples extends VectorList {
 
   private List<double[]> vectorList;
 
-  public SamplesList(List<double[]> vectorList) {
+  public Samples(List<double[]> vectorList) {
     this.vectorList = vectorList;
   }
 

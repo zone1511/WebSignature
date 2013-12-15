@@ -2,7 +2,7 @@ package models;
 
 public class TrainingSet {
 
-  List<FeaturesList> trainingSignatures;
+  List<Features> trainingSignatures;
 
   private double[] means = null;
   private double[] stds = null;
@@ -17,9 +17,9 @@ public class TrainingSet {
     if (means != null)
       return means;
 
-    FeaturesList meanPerSignature = new FeaturesList();
+    Features meanPerSignature = new Features();
 
-    for(FeaturesList signature : trainingSignatures) {
+    for(Features signature : trainingSignatures) {
       meanPerSignature.addVector(signature.meanVector());
     }
 
@@ -32,9 +32,9 @@ public class TrainingSet {
     if (stds != null)
       return stds;
 
-    FeaturesList stdPerSignature = new FeaturesList();
+    Features stdPerSignature = new Features();
 
-    for(FeaturesList signature : trainingSignatures) {
+    for(Features signature : trainingSignatures) {
       stdPerSignature.addVector(signature.stdVector());
     }
 
@@ -52,7 +52,7 @@ public class TrainingSet {
     if (std == null)
       stdVector();
 
-    for(FeaturesList signature : trainingSignatures) {
+    for(Features signature : trainingSignatures) {
       signature.normalize(means, stds);
     }
 
@@ -66,7 +66,7 @@ public class TrainingSet {
   public List<List<ObservationVector>> toObservationVectorLists() {
     List<List<ObservationVector>> signaturesSet = new ArrayList();
 
-    for(FeaturesList signature : trainingSignatures) {
+    for(Features signature : trainingSignatures) {
       signatureSet.add(signature.toObservationVectorList());
     }
 
