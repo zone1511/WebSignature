@@ -14,6 +14,10 @@ public class TrainingSet {
 
   private boolean normalized = false;
 
+  public TrainingSet() {
+    trainingSignatures = new ArrayList<Features>();
+  }
+
   public void addSignature(Signature signature){
     trainingSignatures.add(signature.extractFeatures());
   }
