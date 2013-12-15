@@ -69,10 +69,11 @@ public class SignatureModel {
     mean = signatures.meanVector();
     std = signatures.stdVector();
 
+    //System.out.println("means = "+Arrays.toString(mean));
+    //System.out.println("std = "+Arrays.toString(std));
+
     signatures.normalize();
 
-    System.out.println("means = "+Arrays.toString(mean));
-    System.out.println("std = "+Arrays.toString(std));
     //System.out.println("Traces : "+tracesNormalized.toString());
 
     List<List<ObservationVector>> trainingVectors = signatures.toObservationVectorLists();

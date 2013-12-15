@@ -32,7 +32,7 @@ public class TrainingSet {
       meanPerSignature.addVector(signature.meanVector());
     }
 
-    means = meanPerSignature.meanVector();
+    this.means = meanPerSignature.meanVector();
 
     return means;
   }
@@ -47,7 +47,7 @@ public class TrainingSet {
       stdPerSignature.addVector(signature.stdVector());
     }
 
-    stds = stdPerSignature.meanVector();
+    this.stds = stdPerSignature.meanVector();
 
     return stds;
   }
@@ -60,6 +60,10 @@ public class TrainingSet {
       meanVector();
     if (stds == null)
       stdVector();
+
+    System.out.println("Mean Vector size : "+means.length);
+    System.out.println("Std Vector size : "+stds.length);
+
 
     for(Features signature : trainingSignatures) {
       signature.normalize(means, stds);

@@ -10,7 +10,7 @@ public class Features {
 
   private List<double[]> vectorList;
 
-  private int dimension;
+  private int dimension = 5;
 
   private double[] means = null;
 
@@ -25,7 +25,6 @@ public class Features {
 
   public Features(Samples samples) {
     vectorList = new ArrayList<double[]>();
-    dimension = 5;
 
     samples.setFromOrigin();
     for (int i=0; i<samples.getSize(); i++) {
