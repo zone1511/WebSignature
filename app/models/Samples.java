@@ -1,4 +1,4 @@
-package models.strucutres;
+package models;
 
 import java.util.List;
 
