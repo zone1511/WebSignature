@@ -1,13 +1,24 @@
 package models;
 
 import java.util.List;
+import java.util.ArrayList;
+import be.ac.ulg.montefiore.run.jahmm.ObservationVector;
 
 public class Samples {
 
   private List<double[]> vectorList;
 
-  public Samples(List<double[]> vectorList) {
+  // Instance parameter is here just to fix Java erasure issue.
+  public Samples(List<double[]> vectorList, double[] instance) {
+    // TODO Should clone instead
     this.vectorList = vectorList;
+  }
+
+  public Samples(List<ObservationVector> vectorList, ObservationVector instance) {
+    this.vectorList = new ArrayList<double[]>(); 
+    for(ObservationVector vector : vectorList) {
+      this.vectorList.add(vector.values());
+    }
   }
 
   public void setFromOrigin() {
@@ -45,4 +56,11 @@ public class Samples {
     return vectorList.size();
   }
 
+  public List<ObservationVector> toObservationVectorList() {
+    List<ObservationVector> toObservationVectorList = new ArrayList<ObservationVector>();
+    for(double[] vector : vectorList) {
+      toObservationVectorList.add(new ObservationVector(vector));
+    }
+    return toObservationVectorList;
+  }
 }

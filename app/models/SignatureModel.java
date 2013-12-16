@@ -7,6 +7,7 @@ import be.ac.ulg.montefiore.run.jahmm.*;
 import org.apache.commons.lang.*;
 
 import play.db.ebean.*;
+import play.db.ebean.Model.Finder;
 import play.data.validation.Constraints.*;
 
 import javax.persistence.*;
@@ -16,10 +17,13 @@ import com.avaje.ebean.annotation.CreatedTimestamp;
 import java.sql.Timestamp;
 
 @Entity
-public class SignatureModel {
+public class SignatureModel extends Model{
 
   @Id
   public Long id;
+
+  @OneToOne
+  public User owner;
 
   // @Lob might be necessary for bigger HMMs,
   // but TEXT allows to inspect content of the HMM in the database
@@ -90,6 +94,22 @@ public class SignatureModel {
 
     System.out.println("Average training score : "+averageTrainingScore);
 
+  }
+
+  public static Finder<Long,SignatureModel> find = new Finder<Long,SignatureModel>(
+    Long.class, SignatureModel.class
+  );
+
+  public static List<SignatureModel> all() {
+    return find.all();
+  }
+
+  public static void create(SignatureModel signatureModel) {
+    signatureModel.save();
+  }
+
+  public static void delete(Long id) {
+    find.ref(id).delete();
   }
 }
 

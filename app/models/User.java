@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.*;
 
 import play.db.ebean.*;
+import play.db.ebean.Model.Finder;
 import play.data.validation.Constraints.*;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
@@ -26,6 +27,10 @@ public class User extends Model {
   @JoinColumn(name = "model_id")
   public SignatureModel signatureModel;
 
+  @OneToMany(cascade=CascadeType.ALL)
+  @JoinColumn(name = "owner_id")
+  public List<Signature> signatures;
+
   @CreatedTimestamp
   Timestamp cretime;
 
@@ -40,8 +45,14 @@ public class User extends Model {
     TrainingSet trainingSet = new TrainingSet();
 
     for(List<double[]> rawSignature : rawSignatures) {
-      Signature signature = new Signature(rawSignature, this, Signature.Type.TRAINING, "undefined");    
-      // @TODO : Write in db here =)
+      Signature signature = new Signature(
+        rawSignature,
+        this,
+        Signature.Type.TRAINING,
+        Signature.AcquisitionMethod.UNKNOWN,
+        Signature.DeviceType.UNKNOWN,
+        "undefined", "", -1, -1);    
+      signatures.add(signature);
       trainingSet.addSignature(signature);
     }
 
@@ -50,7 +61,14 @@ public class User extends Model {
   }
 
   public double probability(List<double[]> rawSignature) {
-    Signature signature = new Signature(rawSignature, this, Signature.Type.TRAINING, "undefined");
+    Signature signature = new Signature(
+        rawSignature,
+        this,
+        Signature.Type.TEST,
+        Signature.AcquisitionMethod.UNKNOWN,
+        Signature.DeviceType.UNKNOWN,
+        "undefined", "", -1, -1); 
+        signatures.add(signature);   
     return signatureModel.probability(signature.extractFeatures());
   }
 

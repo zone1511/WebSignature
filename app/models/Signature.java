@@ -2,17 +2,29 @@ package models;
 
 import java.util.List;
 
-//@Entity
-public class Signature {
+import play.db.ebean.*;
+import play.db.ebean.Model.Finder;
+import play.data.validation.Constraints.*;
 
-  //@Id
-  //public Long id;
+import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.EnumMapping;
 
-  //@OneToOne(cascade=CascadeType.ALL)
-  //@JoinColumn(name = "user_id")
+import java.sql.Timestamp;
+
+import javax.persistence.*;
+
+
+
+@Entity
+public class Signature extends Model {
+
+  @Id
+  public Long id;
+
+  @ManyToOne
+  @JoinColumn(name = "owner_id")
   public User owner;
 
-  //@EnumMapping(nameValuePairs="TRAINING=TRA,VALIDATION=VAL,TEST=TST,PRODUCTION=PROD")
   public enum Type {
           TRAINING,
           VALIDATION,
@@ -22,22 +34,88 @@ public class Signature {
 
   public Type type;
 
-  public String device;
+  public enum AcquisitionMethod {
+    MOUSE,
+    TOUCHSCREEN_FINGER,
+    TOUCHSCREEN_STYLUS,
+    TOUCHPAD_FINGER,
+    TOUCHPAD_STYLUS,
+    TABLET_STYLUS,
+    TABLET_PEN,
+    GESTURE,
+    OTHER,
+    UNKNOWN
+  }
 
-  //@CreatedTimestamp
-  //Timestamp cretime;
+  public AcquisitionMethod acquisitionMethod;
 
+  public enum DeviceType {
+    SMARTPHONE,
+    TABLET,
+    PC,
+    OTHER,
+    UNKNOWN
+  }
+
+  public DeviceType deviceType;
+
+  public String deviceName;
+
+  public String deviceDetails;
+
+  public int deviceHeight;
+
+  public int deviceWidth;
+
+  @CreatedTimestamp
+  Timestamp cretime;
+
+  @Version
+  Timestamp updtime;
+
+  @Column(columnDefinition = "TEXT")
   public Samples samples; 
 
-  public Signature(List<double[]> vectorList, User owner, Type type, String device) {
-    this.samples = new Samples(vectorList);
+  public Signature(
+    List<double[]> vectorList,
+    User owner,
+    Type type,
+    AcquisitionMethod acquisitionMethod,
+    DeviceType deviceType,
+    String deviceName,
+    String deviceDetails,
+    int deviceHeight,
+    int deviceWidth
+  ) {
+    this.samples = new Samples(vectorList, vectorList.get(0));
     this.owner = owner;
     this.type = type;
-    this.device = device;
+    this.acquisitionMethod = acquisitionMethod;
+    this.deviceType = deviceType;
+    this.deviceName = deviceName;
+    this.deviceDetails = deviceDetails;
+    this.deviceHeight = deviceHeight;
+    this.deviceWidth = deviceWidth;
   }
 
   public Features extractFeatures() {
     return new Features(samples);
   }
 
+  
+  public static Finder<Long,Signature> find = new Finder<Long,Signature>(
+    Long.class, Signature.class
+  );
+
+  public static List<Signature> all() {
+    return find.all();
+  }
+
+  public static void create(Signature signature) {
+    signature.save();
+  }
+
+  public static void delete(Long id) {
+    find.ref(id).delete();
+  }
 }
