@@ -68,7 +68,7 @@ public class User extends Model {
         Signature.AcquisitionMethod.UNKNOWN,
         Signature.DeviceType.UNKNOWN,
         "undefined", "", -1, -1); 
-        signatures.add(signature);   
+    Signature.create(signature);   
     return signatureModel.probability(signature.extractFeatures());
   }
 
