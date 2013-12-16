@@ -2,8 +2,6 @@ package models;
 
 import play.api.*;
 import java.util.List;
-import java.util.Arrays;
-
 import be.ac.ulg.montefiore.run.jahmm.*;
 
 import org.apache.commons.lang.*;
@@ -16,7 +14,6 @@ import javax.persistence.*;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 
 import java.sql.Timestamp;
-
 
 @Entity
 public class SignatureModel {
@@ -32,43 +29,31 @@ public class SignatureModel {
 
   public double averageTrainingScore;
 
+  @Column(columnDefinition = "TEXT")
+  public ObservationVector mean;
+
+  @Column(columnDefinition = "TEXT")
+  public ObservationVector std;
+
+  public final int nbFeatures = 5;
+  
+  public final int nbStates = 4;
+  
+  public final int nbGaussians = 3;
+
   @CreatedTimestamp
   Timestamp cretime;
 
   @Version
   Timestamp updtime;
 
-  // VERY UGLY CHANGE THIS ASAP :
-  public double meanFeature1;
-  public double meanFeature2;
-  public double meanFeature3;
-  public double meanFeature4;
-  public double meanFeature5;
-  public double stdFeature1;
-  public double stdFeature2;
-  public double stdFeature3;
-  public double stdFeature4;
-  public double stdFeature5;
-
-  @Transient
-  public double[] mean = {1,2,3,4,5};
-  @Transient
-  public double[] std = new double[nbFeatures];
-
-  @Transient
-  private final int nbFeatures = 5;
-  @Transient
-  private final int nbStates = 4;
-  @Transient
-  private final int nbGaussians = 3;
-
   public boolean train(TrainingSet signatures) {
 
-    mean = signatures.meanVector();
-    std = signatures.stdVector();
+    mean = new ObservationVector(signatures.meanVector());
+    std = new ObservationVector(signatures.stdVector());
 
-    //System.out.println("means = "+Arrays.toString(mean));
-    //System.out.println("std = "+Arrays.toString(std));
+    //System.out.println("means = "+mean);
+    //System.out.println("std = "+std);
 
     signatures.normalize();
 
@@ -82,13 +67,20 @@ public class SignatureModel {
 
     computeAverageTrainingScore(signatures);
 
-    //TODO remove this line, use converters instead
-    setValues();
-
     return true;
   }
 
-  public void computeAverageTrainingScore(TrainingSet normTrainingSet) {
+  public double probability(Features signature) {
+
+    signature.normalize(mean.values(), std.values());
+
+    double probability = hiddenMarkovModel.probability(signature.toObservationVectorList());
+    double score = (averageTrainingScore/probability);
+    
+    return score;
+  }
+
+  private void computeAverageTrainingScore(TrainingSet normTrainingSet) {
 
     for(List<ObservationVector> trainingSignature : normTrainingSet.toObservationVectorLists()) {
       averageTrainingScore += hiddenMarkovModel.probability(trainingSignature);
@@ -98,46 +90,6 @@ public class SignatureModel {
 
     System.out.println("Average training score : "+averageTrainingScore);
 
-  }
-
-  public double probability(Features signature) {
-    //TODO remove this line
-    getValues();
-    
-    signature.normalize(mean, std);
-
-    double probability = hiddenMarkovModel.probability(signature.toObservationVectorList());
-    double score = (averageTrainingScore/probability);
-    
-    return score;
-  }
-
-  // dirty little secrets :
-
-  public void setValues() {
-    meanFeature1 = mean[0];
-    meanFeature2 = mean[1];
-    meanFeature3 = mean[2];
-    meanFeature4 = mean[3];
-    meanFeature5 = mean[4];
-    stdFeature1 = std[0];
-    stdFeature2 = std[1];
-    stdFeature3 = std[2];
-    stdFeature4 = std[3];
-    stdFeature5 = std[4];
-  }
-
-  public void getValues() {
-    mean[0] = meanFeature1;
-    mean[1] = meanFeature2;
-    mean[2] = meanFeature3;
-    mean[3] = meanFeature4;
-    mean[4] = meanFeature5;
-    std[0] = stdFeature1;
-    std[1] = stdFeature2;
-    std[2] = stdFeature3;
-    std[3] = stdFeature4;
-    std[4] = stdFeature5;
   }
 }
 

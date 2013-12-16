@@ -34,7 +34,7 @@ public class TrainingSet {
 
     this.means = meanPerSignature.meanVector();
 
-    return means;
+    return means.clone();
   }
 
   public double[] stdVector() {
@@ -49,7 +49,7 @@ public class TrainingSet {
 
     this.stds = stdPerSignature.meanVector();
 
-    return stds;
+    return stds.clone();
   }
 
   public void normalize() {

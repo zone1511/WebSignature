@@ -53,7 +53,7 @@ public class Features {
   }
 
   public double[] getVector(int i) {
-    return vectorList.get(i);
+    return vectorList.get(i).clone();
   }
 
   public int getSize() {
@@ -106,7 +106,7 @@ public class Features {
       means[d] /= vectorList.size();
     }
 
-    return means;
+    return means.clone();
   }
 
   public double[] stdVector(double[] means) {
@@ -127,7 +127,7 @@ public class Features {
       stds[d] = Math.sqrt(stds[d]/vectorList.size());
     }
 
-    return stds;
+    return stds.clone();
   }
 
   public double[] stdVector() {
@@ -139,7 +139,7 @@ public class Features {
   }
 
   public List<double[]> getVectorList() {
-    return vectorList;
+    return new ArrayList(vectorList);
   }
 
 }

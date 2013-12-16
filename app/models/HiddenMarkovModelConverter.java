@@ -41,5 +41,4 @@ public class HiddenMarkovModelConverter implements ScalarTypeConverter<HiddenMar
     }
     return null;
   }
-
 }
