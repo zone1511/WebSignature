@@ -14,7 +14,7 @@ public class Features {
 
   private int nbLocalFeatures = 5;
 
-  private int nbGlobalFeatures = 1;
+  private int nbGlobalFeatures = 5;
 
   private double[] meansLocal = null;
 
@@ -27,6 +27,7 @@ public class Features {
     globalFeatures[0] = samples.getSize();
 
     samples.setFromOrigin();
+    double nbDiscontinuities = 0.;
     for (int i=0; i<samples.getSize(); i++) {
 
       double[] sample = samples.get(i);
@@ -40,16 +41,30 @@ public class Features {
         features[3] = (samples.get(i,1)[1]-samples.get(i,-1)[1])/2.;
         features[4] = Math.sqrt(Math.pow(features[2],2)+Math.pow(features[3],2));
         localFeatures.add(features);
+      } else {
+        nbDiscontinuities+=1.;
       }
     }
+    //globalFeatures[1] = nbDiscontinuities;
+
+    meanLocalVector();
+    stdLocalVector();
+
+    globalFeatures[1] = meansLocal[2];
+    globalFeatures[2] = meansLocal[3];
+    globalFeatures[3] = stdsLocal[2];
+    globalFeatures[4] = stdsLocal[3];
   }
 
   public Features() {
     localFeatures = new ArrayList();
+    nbLocalFeatures = 0;
   }
 
   public void addVector(double[] v) {
     localFeatures.add(v);
+    nbLocalFeatures = v.length;
+    System.out.println("NB : "+nbLocalFeatures);
   }
 
   public double[] getVector(int i) {
@@ -79,6 +94,7 @@ public class Features {
         System.out.println("glob : "+i+" : "+globalFeatures[i]);
         System.out.println("mean : "+meanVector[i]);
         System.out.println("std : "+stdVector[i]);
+
         globalFeatures[i] = (globalFeatures[i]-meanVector[i])/stdVector[i];
       }
   }
@@ -156,7 +172,14 @@ public class Features {
       return stdsLocal;
     else
       return stdLocalVector(meanLocalVector());
+  }
 
+  public double[] getGlobalFeatures() {
+    return globalFeatures.clone();
+  }
+
+  public String toString() {
+    return Arrays.toString(globalFeatures);
   }
 
 }

@@ -56,7 +56,7 @@ public class SignatureModel extends Model{
   
   public final int nbGaussiansLocal = 3;
 
-  public final int nbFeaturesGlobal = 1;
+  public final int nbFeaturesGlobal = 5;
   
   public final int nbGaussiansGlobal = 2;
 
@@ -108,7 +108,7 @@ public class SignatureModel extends Model{
     double scoreGlobal = (averageTrainingScoreGlobal/probabilityGlobal);
 
     System.out.println("Score local : "+scoreLocal);
-    System.out.println("Score global : "+scoreGlobal);
+    System.out.println("Score global : "+scoreGlobal+" p: "+probabilityGlobal);
     
     return scoreLocal*0.6+scoreGlobal*0.4;
   }

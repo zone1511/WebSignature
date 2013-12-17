@@ -2,6 +2,7 @@ package models;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import be.ac.ulg.montefiore.run.jahmm.*;
 
@@ -45,7 +46,7 @@ public class TrainingSet {
     Features meanPerSignature = new Features();
 
     for(Features signature : trainingSignatures) {
-      meanPerSignature.addVector(signature.meanLocalVector());
+      meanPerSignature.addVector(signature.getGlobalFeatures());
     }
 
     this.meansGlobal = meanPerSignature.meanLocalVector();
@@ -61,10 +62,10 @@ public class TrainingSet {
     Features stdPerSignature = new Features();
 
     for(Features signature : trainingSignatures) {
-      stdPerSignature.addVector(signature.stdLocalVector());
+      stdPerSignature.addVector(signature.getGlobalFeatures());
     }
 
-    this.stdsGlobal = stdPerSignature.meanLocalVector();
+    this.stdsGlobal = stdPerSignature.stdLocalVector();
 
     return stdsGlobal.clone();
   }
@@ -103,11 +104,14 @@ public class TrainingSet {
 
 
   public void normalizeGlobalFeatures() {
-
+  
     if (meansGlobal == null)
       meanGlobalVector();
     if (stdsGlobal == null)
       stdGlobalVector();
+
+    System.out.println("Mean Vector : "+Arrays.toString(meansGlobal));
+    System.out.println("Std Vector : "+Arrays.toString(stdsGlobal));
 
     for(Features signature : trainingSignatures) {
       signature.normalizeGlobalFeatures(meansGlobal, stdsGlobal);
@@ -133,7 +137,9 @@ public class TrainingSet {
     List<ObservationVector> signaturesSet = new ArrayList();
 
     for(Features signature : trainingSignatures) {
+      System.out.println(signature.toString());
       signaturesSet.add(signature.toGlobalObservationVector());
+      System.out.println("ADD");
     }
 
     List<List<ObservationVector>> signs = new ArrayList();
