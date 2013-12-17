@@ -8,29 +8,29 @@ import be.ac.ulg.montefiore.run.jahmm.*;
 
 public class Features {
 
-  private List<double[]> vectorList;
+  private List<double[]> localFeatures;
 
-  private int dimension = 5;
+  private double[] globalFeatures;
 
-  private double[] means = null;
+  private int nbLocalFeatures = 5;
 
-  private double[] stds = null;
+  private int nbGlobalFeatures = 1;
 
-  private boolean normalized = false;
+  private double[] meansLocal = null;
 
-  public Features(List<double[]> vectorList, int dimension) {
-    this.vectorList = vectorList;
-    this.dimension = dimension;
-  }
+  private double[] stdsLocal = null;
 
   public Features(Samples samples) {
-    vectorList = new ArrayList<double[]>();
+    localFeatures = new ArrayList<double[]>();
+
+    globalFeatures = new double[nbGlobalFeatures];
+    globalFeatures[0] = samples.getSize();
 
     samples.setFromOrigin();
     for (int i=0; i<samples.getSize(); i++) {
 
       double[] sample = samples.get(i);
-      double[] features = new double[dimension];
+      double[] features = new double[nbLocalFeatures];
 
       //Sample value [-1, -1, -1] is only here to indicate a discontinuity.
       if (sample[0] != -1) {
@@ -39,48 +39,54 @@ public class Features {
         features[2] = (samples.get(i,1)[0]-samples.get(i,-1)[0])/2.;
         features[3] = (samples.get(i,1)[1]-samples.get(i,-1)[1])/2.;
         features[4] = Math.sqrt(Math.pow(features[2],2)+Math.pow(features[3],2));
-        vectorList.add(features);
+        localFeatures.add(features);
       }
     }
   }
 
   public Features() {
-    vectorList = new ArrayList();
+    localFeatures = new ArrayList();
   }
 
   public void addVector(double[] v) {
-    vectorList.add(v);
+    localFeatures.add(v);
   }
 
   public double[] getVector(int i) {
-    return vectorList.get(i).clone();
+    return localFeatures.get(i).clone();
   }
 
   public int getSize() {
-    return vectorList.size();
+    return localFeatures.size();
   }
 
-  public int getDimension() {
-    return dimension;
+  public int getNbLocalFeatures() {
+    return nbLocalFeatures;
   }
 
-  public void normalize(double[] meanVector, double[] stdVector) {
+  public void normalizeLocalFeatures(double[] meanVector, double[] stdVector) {
 
-    assert !normalized : "Already normalized !";
-
-    for(double[] vector : vectorList) {
-      for(int i=0; i<dimension; i++) {
+    for(double[] vector : localFeatures) {
+      for(int i=0; i<nbLocalFeatures; i++) {
         vector[i] = (vector[i]-meanVector[i])/stdVector[i];
       }
     }
-
-    normalized = true;
   }
 
-  public List<ObservationVector> toObservationVectorList() {
+  public void normalizeGlobalFeatures(double[] meanVector, double[] stdVector) {
+
+      for(int i=0; i<nbGlobalFeatures; i++) {
+        System.out.println("glob : "+i+" : "+globalFeatures[i]);
+        System.out.println("mean : "+meanVector[i]);
+        System.out.println("std : "+stdVector[i]);
+        globalFeatures[i] = (globalFeatures[i]-meanVector[i])/stdVector[i];
+      }
+  }
+
+  public List<ObservationVector> toLocalObservationVectorList() {
     List<ObservationVector> observationVectorList = new ArrayList();
 
-    for(double[] vector : vectorList) {
+    for(double[] vector : localFeatures) {
       ObservationVector observationVector = new ObservationVector(vector);
       observationVectorList.add(observationVector);
     }
@@ -88,58 +94,69 @@ public class Features {
     return observationVectorList;
   }
 
-  public double[] meanVector() {
+  public ObservationVector toGlobalObservationVector() {
 
-    if (means != null)
-      return means;
+    ObservationVector observationVector = new ObservationVector(globalFeatures);
 
-    means = new double[dimension];
-    Arrays.fill(means, 0);
+    return observationVector;
+  }
 
-    for(double[] vector : vectorList) {
-      for(int d=0; d<dimension; d++) {
-        means[d] += vector[d];
+  public List<ObservationVector> toGlobalObservationVectorList() {
+    List<ObservationVector> observationVectorList = new ArrayList();
+    ObservationVector observationVector = new ObservationVector(globalFeatures);
+    observationVectorList.add(observationVector);
+
+    return observationVectorList;
+  }
+
+  public double[] meanLocalVector() {
+
+    if (meansLocal != null)
+      return meansLocal;
+
+    meansLocal = new double[nbLocalFeatures];
+    Arrays.fill(meansLocal, 0);
+
+    for(double[] vector : localFeatures) {
+      for(int d=0; d<nbLocalFeatures; d++) {
+        meansLocal[d] += vector[d];
       }
     }
 
-    for(int d=0; d<dimension; d++) {
-      means[d] /= vectorList.size();
+    for(int d=0; d<nbLocalFeatures; d++) {
+      meansLocal[d] /= localFeatures.size();
     }
 
-    return means.clone();
+    return meansLocal.clone();
   }
 
-  public double[] stdVector(double[] means) {
+  public double[] stdLocalVector(double[] meansLocal) {
 
-    if (stds != null)
-      return stds;
+    if (stdsLocal != null)
+      return stdsLocal;
 
-    stds = new double[dimension];
-    Arrays.fill(stds, 0);
+    stdsLocal = new double[nbLocalFeatures];
+    Arrays.fill(stdsLocal, 0);
 
-    for(double[] vector : vectorList) {
-      for(int d=0; d<dimension; d++) {
-        stds[d] += Math.pow((vector[d]-means[d]),2);
+    for(double[] vector : localFeatures) {
+      for(int d=0; d<nbLocalFeatures; d++) {
+        stdsLocal[d] += Math.pow((vector[d]-meansLocal[d]),2);
       }
     }
 
-    for(int d=0; d<dimension; d++) {
-      stds[d] = Math.sqrt(stds[d]/vectorList.size());
+    for(int d=0; d<nbLocalFeatures; d++) {
+      stdsLocal[d] = Math.sqrt(stdsLocal[d]/localFeatures.size());
     }
 
-    return stds.clone();
+    return stdsLocal.clone();
   }
 
-  public double[] stdVector() {
-    if (stds != null)
-      return stds;
+  public double[] stdLocalVector() {
+    if (stdsLocal != null)
+      return stdsLocal;
     else
-      return stdVector(meanVector());
+      return stdLocalVector(meanLocalVector());
 
-  }
-
-  public List<double[]> getVectorList() {
-    return new ArrayList(vectorList);
   }
 
 }

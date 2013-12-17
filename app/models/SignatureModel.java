@@ -31,19 +31,34 @@ public class SignatureModel extends Model{
   @Column(columnDefinition = "TEXT")
   public HiddenMarkovModel hiddenMarkovModel;
 
-  public double averageTrainingScore;
+  @Column(columnDefinition = "TEXT")
+  public HiddenMarkovModel gaussianMixtureModel;
+
+  public double averageTrainingScoreLocal;
+
+  public double averageTrainingScoreGlobal;
 
   @Column(columnDefinition = "TEXT")
-  public ObservationVector mean;
+  public ObservationVector meanLocal;
 
   @Column(columnDefinition = "TEXT")
-  public ObservationVector std;
+  public ObservationVector stdLocal;
 
-  public final int nbFeatures = 5;
+  @Column(columnDefinition = "TEXT")
+  public ObservationVector meanGlobal;
+
+  @Column(columnDefinition = "TEXT")
+  public ObservationVector stdGlobal;
+
+  public final int nbFeaturesLocal = 5;
   
-  public final int nbStates = 4;
+  public final int nbStatesLocal = 4;
   
-  public final int nbGaussians = 3;
+  public final int nbGaussiansLocal = 3;
+
+  public final int nbFeaturesGlobal = 1;
+  
+  public final int nbGaussiansGlobal = 2;
 
   @CreatedTimestamp
   Timestamp cretime;
@@ -53,21 +68,27 @@ public class SignatureModel extends Model{
 
   public boolean train(TrainingSet signatures) {
 
-    mean = new ObservationVector(signatures.meanVector());
-    std = new ObservationVector(signatures.stdVector());
+    meanLocal = new ObservationVector(signatures.meanLocalVector());
+    stdLocal = new ObservationVector(signatures.stdLocalVector());
 
-    //System.out.println("means = "+mean);
-    //System.out.println("std = "+std);
+    signatures.normalizeLocalFeatures();
 
-    signatures.normalize();
+    List<List<ObservationVector>> trainingVectorsLocal = signatures.toLocalObservationVectorLists();
 
-    //System.out.println("Traces : "+tracesNormalized.toString());
+    hiddenMarkovModel = new HiddenMarkovModel(trainingVectorsLocal, nbGaussiansLocal, nbFeaturesLocal, nbStatesLocal);
 
-    List<List<ObservationVector>> trainingVectors = signatures.toObservationVectorLists();
+    hiddenMarkovModel.train(trainingVectorsLocal);
 
-    hiddenMarkovModel = new HiddenMarkovModel(trainingVectors, nbGaussians, nbFeatures, nbStates);
+    meanGlobal = new ObservationVector(signatures.meanGlobalVector());
+    stdGlobal = new ObservationVector(signatures.stdGlobalVector());
 
-    hiddenMarkovModel.train(trainingVectors);
+    signatures.normalizeGlobalFeatures();
+
+    List<List<ObservationVector>> trainingVectorsGlobal = signatures.toGlobalObservationVectorLists();
+
+    gaussianMixtureModel = new HiddenMarkovModel(trainingVectorsGlobal, nbGaussiansGlobal, nbFeaturesGlobal, 1);
+
+    gaussianMixtureModel.train(trainingVectorsGlobal);
 
     computeAverageTrainingScore(signatures);
 
@@ -76,23 +97,38 @@ public class SignatureModel extends Model{
 
   public double probability(Features signature) {
 
-    signature.normalize(mean.values(), std.values());
+    signature.normalizeLocalFeatures(meanLocal.values(), stdLocal.values());
 
-    double probability = hiddenMarkovModel.probability(signature.toObservationVectorList());
-    double score = (averageTrainingScore/probability);
+    double probabilityLocal = hiddenMarkovModel.probability(signature.toLocalObservationVectorList());
+    double scoreLocal = (averageTrainingScoreLocal/probabilityLocal);
+
+    signature.normalizeGlobalFeatures(meanGlobal.values(), stdGlobal.values());
+
+    double probabilityGlobal = gaussianMixtureModel.probability(signature.toGlobalObservationVectorList());
+    double scoreGlobal = (averageTrainingScoreGlobal/probabilityGlobal);
+
+    System.out.println("Score local : "+scoreLocal);
+    System.out.println("Score global : "+scoreGlobal);
     
-    return score;
+    return scoreLocal*0.6+scoreGlobal*0.4;
   }
 
   private void computeAverageTrainingScore(TrainingSet normTrainingSet) {
 
-    for(List<ObservationVector> trainingSignature : normTrainingSet.toObservationVectorLists()) {
-      averageTrainingScore += hiddenMarkovModel.probability(trainingSignature);
+    for(List<ObservationVector> trainingSignature : normTrainingSet.toLocalObservationVectorLists()) {
+      averageTrainingScoreLocal += hiddenMarkovModel.probability(trainingSignature);
     }
 
-    averageTrainingScore /= normTrainingSet.getSize();
+    averageTrainingScoreLocal /= normTrainingSet.getSize();
 
-    System.out.println("Average training score : "+averageTrainingScore);
+    for(List<ObservationVector> trainingSignature : normTrainingSet.toGlobalObservationVectorLists()) {
+      averageTrainingScoreGlobal += gaussianMixtureModel.probability(trainingSignature);
+    }
+
+    averageTrainingScoreGlobal /= normTrainingSet.getSize();
+
+    System.out.println("Average training score local : "+averageTrainingScoreLocal);
+    System.out.println("Average training score global : "+averageTrainingScoreGlobal);
 
   }
 
