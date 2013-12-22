@@ -1,4 +1,4 @@
-function signatureCanvas(element, add_button, enroll_button, check_button, clear_button, add_success, enrollment_pending, enrollment_success, check_success, error, username) {
+function SignaturePad(element) {
 
   this.canvas = element[0];
   this.context = canvas.getContext('2d');
@@ -19,61 +19,60 @@ function signatureCanvas(element, add_button, enroll_button, check_button, clear
   this.timeout = null;
   this.start = null;
 
-
   this.startSampling = function(freq) {
     console.log("Sampling frequency : "+freq+"Hz");
     console.log("Equivalent interval : "+(1.0/freq)*1000+"ms");
-    trace = [];
-    this.sampler = setInterval(sample, (1.0/freq)*1000);
-    //this.timeout = setTimeout(timeout, 10000);
+    this.trace = [];
+    this.boundSampler = this.sample.bind(this);
+    this.sampler = setInterval(this.boundSampler, (1.0/freq)*1000);
   };
 
   this.sample = function() {
-    var t = new Date().getTime() - start;
-    if(painting) {
-      trace.push({x : penPosition.x, y : penPosition.y, t : t});
+    var t = new Date().getTime() - this.start;
+    if(this.painting) {
+      this.trace.push({x : this.penPosition.x, y : this.penPosition.y, t : t});
     } else {
       //trace.push({x : -1, y : -1, t : t});
     }
   };
 
-  this.sendSign = function() {
+  this.sendSign = function(username, add_success, error) {
     $.ajax({
       url: jsRoutes.controllers.Enrollment.addEnrollmentSignature().url,
       type: "POST",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: JSON.stringify({
-        name: username.val(),
-        signature: trace
+        name: username,
+        signature: this.trace
       })
     }).done(function() {
       add_success();
     }).fail(function() {
       error();
     });
-    clear();
+    this.clear();
   };
 
-  this.findProba = function() {
+  this.findProba = function(username, check_success, error) {
     $.ajax({
       url: jsRoutes.controllers.Enrollment.probaSignature().url,
       type: "POST",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: JSON.stringify({
-        name: username.val(),
-        signature: trace
+        name: username,
+        signature: this.trace
       })
     }).done(function(data) {
       check_success(data.probability);
     }).fail(function() {
       error();
     });
-    clear();
+    this.clear();
   };
 
-  this.enroll = function() {
+  this.enroll = function(enrollment_pending, enrollment_success, error) {
     enrollment_pending();
     $.ajax({
       url: jsRoutes.controllers.Enrollment.enroll().url,
@@ -89,9 +88,9 @@ function signatureCanvas(element, add_button, enroll_button, check_button, clear
     var events = signals.split(' ');
     for (var i=0, nbEvents=events.length; i<nbEvents; i++) {
       if(add) {
-        canvas.addEventListener(events[i], listener, false);
+        this.canvas.addEventListener(events[i], listener, false);
       } else {
-        canvas.removeEventListener(events[i], listener, false);
+        this.canvas.removeEventListener(events[i], listener, false);
       }
     }
   };
@@ -99,92 +98,81 @@ function signatureCanvas(element, add_button, enroll_button, check_button, clear
   this.updatePenPosition = function(event) {
     event.preventDefault();
 
-    lastPenPosition.x = penPosition.x;
-    lastPenPosition.y = penPosition.y;
+    this.lastPenPosition.x = this.penPosition.x;
+    this.lastPenPosition.y = this.penPosition.y;
 
     if(event.type.indexOf("touch") >= 0) {
-      penPosition.x = event.targetTouches[0].pageX - canvas.offsetLeft;
-      penPosition.y = event.targetTouches[0].pageY - canvas.offsetTop;
+      this.penPosition.x = event.targetTouches[0].pageX - this.canvas.offsetLeft;
+      this.penPosition.y = event.targetTouches[0].pageY - this.canvas.offsetTop;
     } else {
-      penPosition.x = event.pageX - canvas.offsetLeft;
-      penPosition.y = event.pageY - canvas.offsetTop;
+      this.penPosition.x = event.pageX - this.canvas.offsetLeft;
+      this.penPosition.y = event.pageY - this.canvas.offsetTop;
     }
   };
 
   this.onPaint = function(event) {
     event.preventDefault();
 
-    context.beginPath();
-    context.moveTo(lastPenPosition.x, lastPenPosition.y);
-    context.lineTo(penPosition.x, penPosition.y);
-    context.closePath();
-    context.stroke();
+    this.context.beginPath();
+    this.context.moveTo(this.lastPenPosition.x, this.lastPenPosition.y);
+    this.context.lineTo(this.penPosition.x, this.penPosition.y);
+    this.context.closePath();
+    this.context.stroke();
   };
 
   this.onInteraction = function(event) {
     event.preventDefault();
 
-    trace.push({x : -1, y : -1, t : -1});
+    this.trace.push({x : -1, y : -1, t : -1});
 
-    if(!signatureStarted) {
-      start = new Date().getTime();
-      startSampling(100);
-      signatureStarted = true;
+    if(!this.signatureStarted) {
+      this.start = new Date().getTime();
+      this.startSampling(100);
+      this.signatureStarted = true;
     }
 
-    updatePenPosition(event);
+    this.updatePenPosition(event);
 
-    painting = true;
-    canvasListeners(
+    this.painting = true;
+    //It is not possible to remove binded listners if we do not keep track of them
+    //See http://stackoverflow.com/questions/11565471/removing-event-listener-which-was-added-with-bind
+    this.painter = this.onPaint.bind(this);
+    this.canvasListeners(
       'mousemove touchmove',
-      onPaint, true
+      this.painter, true
     );
   };
 
   this.onStopInteraction = function(event) {
     event.preventDefault();
-    painting = false;
-    canvasListeners(
+    this.painting = false;
+    this.canvasListeners(
       'mousemove touchmove',
-      onPaint, false
+      this.painter, false
     );
   };
 
   this.clear = function() {
-    clearInterval(sampler);
+    clearInterval(this.boundSampler);
     //clearTimeout(timeout);
-    signatureStarted = false;
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    this.signatureStarted = false;
+    this.context.setTransform(1, 0, 0, 1, 0, 0);
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.trace = [];
-  }
+  };
 
-  canvasListeners(
+  this.canvasListeners(
     'mousemove touchmove',
-    updatePenPosition, true
+    this.updatePenPosition.bind(this), true
   );
 
-  canvasListeners(
+  this.canvasListeners(
     'mousedown touchstart',
-    onInteraction, true
+    this.onInteraction.bind(this), true
   );
 
-  canvasListeners(
+  this.canvasListeners(
     'mouseup touchend touchcancel touchleave',
-    onStopInteraction, true
+    this.onStopInteraction.bind(this), true
   );
-
-  //this should be in the views
-  if(add_button) {
-    add_button.click(sendSign);
-  }
-  if(enroll_button) {
-    enroll_button.click(enroll);
-  }
-  if(check_button) {
-    check_button.click(findProba);
-  }
-  if(clear_button) {
-    clear_button.click(clear);
-  }
 }

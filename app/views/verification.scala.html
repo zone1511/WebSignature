@@ -1,82 +1,78 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Verification</title>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/signatureCanvas.js")" type="text/javascript"></script>
-        <script src="@routes.Application.javascriptRoutes" type="text/javascript"></script>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    </head>
-    <body>
-        <div id="check_success" class="info"><div class="info_text"></div></div>
-        <div id="error" class="info"><div class="info_text">Oops...</div></div>
-        <div id="username" class="info"><div class="info_text">
-            Username : <input type="text" name="username"><br>
-            <button type="button" id="ok">Done</button>
-        </div></div>
-      <canvas id="signPad" width="640px" height="300px"></canvas>
-    <div id="menu">
-            <li><a href="#" id="clear"><div class="menu_text">Clear</div></a></li>
-            <li><a href="#" id="check"><div class="menu_text">Verify</div></a></li>
-            <li><a href="#" id="user"><div class="menu_text">User</div></a></li>
-    </div>
-    <script>
-            var green = 13;
-            var canvas = $("#signPad")[0];
-            canvas.width  = window.innerWidth*0.8;
-            canvas.height = window.innerHeight;
-            $(window).resize(function(){
-                canvas.width  = window.innerWidth*0.8;
-                canvas.height = window.innerHeight;
-            });
+  <head>
+      <title>Verification</title>
+      <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+      <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+      <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
+      <script src="@routes.Assets.at("javascripts/signatureCanvas.js")" type="text/javascript"></script>
+      <script src="@routes.Application.javascriptRoutes" type="text/javascript"></script>
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  </head>
+  <body>
+      <div id="check_success" class="info"><div class="info_text"></div></div>
+      <div id="error" class="info"><div class="info_text">Oops...</div></div>
+      <div id="username" class="info"><div class="info_text">
+          <h1>Signature Verification</h1>
+          <form id="verif">
+              <input type="text" name="username" autocomplete="off" placeholder="Username"><br><br>
+              <input type="submit" id="ok" value="Next">
+          </form>
+      </div></div>
+    <canvas id="signPad"></canvas>
+  <div id="menu" class="verification-menu">
+          <li><a href="#" id="clear"><div class="menu_text">-</div></a></li>
+          <li><a href="#" id="check"><div class="menu_text">✓</div></a></li>
+  </div>
+  <script>
+  var green = 13;
+  var canvas = $("#signPad")[0];
+  canvas.width  = window.innerWidth*0.9;
+  canvas.height = window.innerHeight;
+  $(window).resize(function(){
+    canvas.width  = window.innerWidth*0.9;
+    canvas.height = window.innerHeight;
+  });
+  var signPad = new SignaturePad($("#signPad"));
 
-            $("#username").css( "display", "table");
-            
-            $("#user").click(function() {
-                $("#username").css( "display", "table");
-            });
-            $("#ok").click(function() {
-                $("#username").css( "display", "none");
-            });
+  $("#username").css( "display", "table");
 
-            var check_success = function(proba) { 
-                $("#check_success").css( "display", "table");
-                if (proba > 0.8) {
-                    $("#check_success .info_text").text("OK ! Probability : "+proba);
-                    $("#check_success").css( "background-color", "green");
-                } else {
-                    $("#check_success .info_text").text("Nope ! Probability : "+proba);
-                    $("#check_success").css( "background-color", "red");
-                }
-                $("#check_success").click(function() {
-                    $("#check_success").css( "display", "none");
-                });
-            }
+  $("#verif").submit(function(event) {
+    $("#username").css( "display", "none");
+    event.preventDefault();
+  });
 
-            var error = function() {
-                green = 13;
-                $("#check_success").css( "display", "none");
-                $("#error").css( "display", "table");
-                $("#error").click(function() {
-                    $("#error").css( "display", "none");
-                });
-            }
-            
-      var signPad = signatureCanvas(
-                $("#signPad"),
-                null,
-                null,
-                $("#check"),
-                $("#clear"),
-                null,
-                null,
-                null,
-                check_success,
-                error,
-                $("input[name=username]")
-            );
-    </script>
-    </body>
+  var check_success = function(proba) { 
+    $("#check_success").css( "display", "table");
+    if (proba > 0.8) {
+      $("#check_success .info_text").text("OK ! Probability : "+proba);
+      $("#check_success").css( "background-color", "green");
+    } else {
+      $("#check_success .info_text").text("Nope ! Probability : "+proba);
+      $("#check_success").css( "background-color", "red");
+    }
+    $("#check_success").click(function() {
+      $("#check_success").css( "display", "none");
+    });
+  }
+
+  var error = function() {
+    green = 13;
+    $("#check_success").css( "display", "none");
+    $("#error").css( "display", "table");
+    $("#error").click(function() {
+      $("#error").css( "display", "none");
+    });
+  }
+
+  $("#check").click(function() {
+    signPad.findProba($("input[name=username]").val(), check_success, error);
+  });
+
+  $("#clear").click(function() {
+    signPad.clear();
+  });
+
+  </script>
+  </body>
 </html>

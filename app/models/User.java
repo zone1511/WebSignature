@@ -23,6 +23,8 @@ public class User extends Model {
   @Required
   public String name;
 
+  public String email;
+
   @OneToOne(cascade=CascadeType.ALL)
   @JoinColumn(name = "model_id")
   public SignatureModel signatureModel;
@@ -58,6 +60,29 @@ public class User extends Model {
 
     signatureModel = new SignatureModel();
     return signatureModel.train(trainingSet);
+  }
+
+  public boolean enroll() {
+
+    TrainingSet trainingSet = new TrainingSet(signatures);
+
+    signatureModel = new SignatureModel();
+
+    return signatureModel.train(trainingSet);
+  }
+
+  public boolean addSignature(List<double[]> rawSignature) {
+    Signature signature = new Signature(
+      rawSignature,
+      this,
+      Signature.Type.TRAINING,
+      Signature.AcquisitionMethod.UNKNOWN,
+      Signature.DeviceType.UNKNOWN,
+      "undefined", "", -1, -1);    
+    signatures.add(signature);
+    this.save();
+    
+    return true;
   }
 
   public double probability(List<double[]> rawSignature) {

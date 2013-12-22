@@ -20,6 +20,13 @@ public class TrainingSet {
     trainingSignatures = new ArrayList<Features>();
   }
 
+  public TrainingSet(List<Signature> signatures) {
+    trainingSignatures = new ArrayList<Features>();
+    for (Signature signature : signatures) {
+      trainingSignatures.add(signature.extractFeatures());
+    }
+  }
+
   public void addSignature(Signature signature){
     trainingSignatures.add(signature.extractFeatures());
   }
