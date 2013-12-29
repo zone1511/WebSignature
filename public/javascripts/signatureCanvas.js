@@ -55,6 +55,7 @@ function SignaturePad(element) {
   };
 
   this.findProba = function(username, check_success, error) {
+    console.log(this.trace);
     $.ajax({
       url: jsRoutes.controllers.Enrollment.probaSignature().url,
       type: "POST",
@@ -70,6 +71,8 @@ function SignaturePad(element) {
       error();
     });
     this.clear();
+    console.log("After (should be blank): ");
+    console.log(this.trace);
   };
 
   this.enroll = function(enrollment_pending, enrollment_success, error) {
@@ -153,12 +156,13 @@ function SignaturePad(element) {
   };
 
   this.clear = function() {
-    clearInterval(this.boundSampler);
+    clearInterval(this.sampler);
     //clearTimeout(timeout);
     this.signatureStarted = false;
     this.context.setTransform(1, 0, 0, 1, 0, 0);
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.trace = [];
+    this.boundSampler = null;
   };
 
   this.canvasListeners(

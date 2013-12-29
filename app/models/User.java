@@ -23,7 +23,7 @@ public class User extends Model {
   @Required
   public String name;
 
-  public String email;
+  //public String email;
 
   @OneToOne(cascade=CascadeType.ALL)
   @JoinColumn(name = "model_id")
@@ -86,6 +86,7 @@ public class User extends Model {
   }
 
   public double probability(List<double[]> rawSignature) {
+    System.out.println("Probability");
     Signature signature = new Signature(
         rawSignature,
         this,

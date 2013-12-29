@@ -50,13 +50,13 @@ public class SignatureModel extends Model{
   @Column(columnDefinition = "TEXT")
   public ObservationVector stdGlobal;
 
-  public final int nbFeaturesLocal = 5;
+  public final int nbFeaturesLocal = 2;
   
   public final int nbStatesLocal = 4;
   
   public final int nbGaussiansLocal = 3;
 
-  public final int nbFeaturesGlobal = 5;
+  public final int nbFeaturesGlobal = 1;
   
   public final int nbGaussiansGlobal = 2;
 
@@ -100,12 +100,12 @@ public class SignatureModel extends Model{
     signature.normalizeLocalFeatures(meanLocal.values(), stdLocal.values());
 
     double probabilityLocal = hiddenMarkovModel.probability(signature.toLocalObservationVectorList());
-    double scoreLocal = (averageTrainingScoreLocal/probabilityLocal);
+    double scoreLocal = averageTrainingScoreLocal/probabilityLocal;
 
     signature.normalizeGlobalFeatures(meanGlobal.values(), stdGlobal.values());
 
     double probabilityGlobal = gaussianMixtureModel.probability(signature.toGlobalObservationVectorList());
-    double scoreGlobal = (averageTrainingScoreGlobal/probabilityGlobal);
+    double scoreGlobal = averageTrainingScoreGlobal/probabilityGlobal;
 
     System.out.println("Score local : "+scoreLocal);
     System.out.println("Score global : "+scoreGlobal+" p: "+probabilityGlobal);

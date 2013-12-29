@@ -94,7 +94,7 @@ object Enrollment extends Controller {
     signatures = ListBuffer[ListBuffer[Array[Double]]]()
     val user : User = new User(username)
     val train = Future{ user.enroll(aSign) }
-    val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 120.seconds)
+    val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 300.seconds)
     Async {
       Future.firstCompletedOf(Seq(train, timeoutFuture)).map { 
         case i: Boolean => {

@@ -46,7 +46,6 @@ create table signature_model (
 create table user (
   id                        bigint not null,
   name                      varchar(255),
-  email                     varchar(255),
   model_id                  bigint,
   cretime                   timestamp not null,
   updtime                   timestamp not null,
