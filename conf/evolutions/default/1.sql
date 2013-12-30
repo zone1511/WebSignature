@@ -43,7 +43,7 @@ create table signature_model (
   constraint pk_signature_model primary key (id))
 ;
 
-create table user (
+create table user_table (
   id                        bigint not null,
   name                      varchar(255),
   email                     varchar(255),
