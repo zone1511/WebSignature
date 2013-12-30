@@ -50,21 +50,21 @@ create table user_table (
   model_id                  bigint,
   cretime                   timestamp not null,
   updtime                   timestamp not null,
-  constraint pk_user primary key (id))
+  constraint pk_user_table primary key (id))
 ;
 
 create sequence signature_seq;
 
 create sequence signature_model_seq;
 
-create sequence user_seq;
+create sequence user_table_seq;
 
-alter table signature add constraint fk_signature_owner_1 foreign key (owner_id) references user (id) on delete restrict on update restrict;
+alter table signature add constraint fk_signature_owner_1 foreign key (owner_id) references user_table (id) on delete restrict on update restrict;
 create index ix_signature_owner_1 on signature (owner_id);
-alter table signature_model add constraint fk_signature_model_owner_2 foreign key (owner_id) references user (id) on delete restrict on update restrict;
+alter table signature_model add constraint fk_signature_model_owner_2 foreign key (owner_id) references user_table (id) on delete restrict on update restrict;
 create index ix_signature_model_owner_2 on signature_model (owner_id);
-alter table user add constraint fk_user_signatureModel_3 foreign key (model_id) references signature_model (id) on delete restrict on update restrict;
-create index ix_user_signatureModel_3 on user (model_id);
+alter table user_table add constraint fk_user_table_signatureModel_3 foreign key (model_id) references signature_model (id) on delete restrict on update restrict;
+create index ix_user_table_signatureModel_3 on user_table (model_id);
 
 
 
@@ -76,7 +76,7 @@ drop table if exists signature;
 
 drop table if exists signature_model;
 
-drop table if exists user;
+drop table if exists user_table;
 
 SET REFERENTIAL_INTEGRITY TRUE;
 
@@ -84,5 +84,5 @@ drop sequence if exists signature_seq;
 
 drop sequence if exists signature_model_seq;
 
-drop sequence if exists user_seq;
+drop sequence if exists user_table_seq;
 
