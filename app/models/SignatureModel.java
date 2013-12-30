@@ -36,10 +36,10 @@ public class SignatureModel extends Model{
   @Column(columnDefinition = "TEXT")
   public HiddenMarkovModel gaussianMixtureModel;
 
-  @Column(columnDefinition = "NUMERIC")
+  @Column(columnDefinition = "DOUBLE PRECISION")
   public double averageTrainingScoreLocal;
 
-  @Column(columnDefinition = "NUMERIC")
+  @Column(columnDefinition = "DOUBLE PRECISION")
   public double averageTrainingScoreGlobal;
 
   @Column(columnDefinition = "TEXT")
@@ -54,19 +54,14 @@ public class SignatureModel extends Model{
   @Column(columnDefinition = "TEXT")
   public ObservationVector stdGlobal;
 
-  @Column(columnDefinition = "NUMERIC")
   public final int nbFeaturesLocal = 5;
   
-  @Column(columnDefinition = "NUMERIC")
   public final int nbStatesLocal = 4;
   
-  @Column(columnDefinition = "NUMERIC")
   public final int nbGaussiansLocal = 3;
 
-  @Column(columnDefinition = "NUMERIC")
   public final int nbFeaturesGlobal = 5;
   
-  @Column(columnDefinition = "NUMERIC")
   public final int nbGaussiansGlobal = 2;
 
   @CreatedTimestamp
