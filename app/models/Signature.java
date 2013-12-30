@@ -63,8 +63,10 @@ public class Signature extends Model {
 
   public String deviceDetails;
 
+  @Column(columnDefinition = "NUMERIC")
   public int deviceHeight;
 
+  @Column(columnDefinition = "NUMERIC")
   public int deviceWidth;
 
   @CreatedTimestamp
