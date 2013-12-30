@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 import javax.persistence.*;
 
 @Entity
+@Table(name="user_table")
 public class User extends Model {
 
   @Id
