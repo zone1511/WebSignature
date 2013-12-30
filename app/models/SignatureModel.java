@@ -4,6 +4,8 @@ import play.api.*;
 import java.util.List;
 import be.ac.ulg.montefiore.run.jahmm.*;
 
+import java.lang.Math;
+
 import org.apache.commons.lang.*;
 
 import play.db.ebean.*;
@@ -50,15 +52,15 @@ public class SignatureModel extends Model{
   @Column(columnDefinition = "TEXT")
   public ObservationVector stdGlobal;
 
-  public final int nbFeaturesLocal = 2;
+  public final int nbFeaturesLocal = 5;
   
   public final int nbStatesLocal = 4;
   
   public final int nbGaussiansLocal = 3;
 
-  public final int nbFeaturesGlobal = 1;
+  public final int nbFeaturesGlobal = 5;
   
-  public final int nbGaussiansGlobal = 2;
+  public final int nbGaussiansGlobal = 1;
 
   @CreatedTimestamp
   Timestamp cretime;
@@ -110,7 +112,11 @@ public class SignatureModel extends Model{
     System.out.println("Score local : "+scoreLocal);
     System.out.println("Score global : "+scoreGlobal+" p: "+probabilityGlobal);
     
-    return scoreLocal*0.6+scoreGlobal*0.4;
+    return bound(scoreLocal)*0.6+bound(scoreGlobal)*0.4;
+  }
+
+  private double bound(double score) {
+    return Math.min(1.,Math.max(0.,score));
   }
 
   private void computeAverageTrainingScore(TrainingSet normTrainingSet) {

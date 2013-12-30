@@ -9,6 +9,7 @@ libraryDependencies ++= Seq(
   javaJdbc,
   javaEbean,
   "commons-lang" % "commons-lang" % "2.6"
+  "postgresql" % "postgresql" % "8.4-702.jdbc4"
 )     
 
 play.Project.playScalaSettings

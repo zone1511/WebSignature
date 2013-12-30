@@ -23,7 +23,7 @@ public class User extends Model {
   @Required
   public String name;
 
-  //public String email;
+  public String email;
 
   @OneToOne(cascade=CascadeType.ALL)
   @JoinColumn(name = "model_id")

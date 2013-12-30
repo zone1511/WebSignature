@@ -12,9 +12,9 @@ public class Features {
 
   private double[] globalFeatures;
 
-  private int nbLocalFeatures = 2;
+  private int nbLocalFeatures = 5;
 
-  private int nbGlobalFeatures = 1;
+  private int nbGlobalFeatures = 5;
 
   private double[] meansLocal = null;
 
@@ -38,9 +38,9 @@ public class Features {
       if (sample[0] != -1) {
         features[0] = sample[0];
         features[1] = sample[1];
-        //features[2] = (samples.get(i,1)[0]-samples.get(i,-1)[0])/2.;
-        //features[3] = (samples.get(i,1)[1]-samples.get(i,-1)[1])/2.;
-        //features[4] = Math.sqrt(Math.pow(features[2],2)+Math.pow(features[3],2));
+        features[2] = (samples.get(i,1)[0]-samples.get(i,-1)[0])/2.;
+        features[3] = (samples.get(i,1)[1]-samples.get(i,-1)[1])/2.;
+        features[4] = Math.sqrt(Math.pow(features[2],2)+Math.pow(features[3],2));
         localFeatures.add(features);
       } else {
         nbDiscontinuities+=1.;
@@ -51,10 +51,10 @@ public class Features {
     meanLocalVector();
     stdLocalVector();
 
-    //globalFeatures[1] = meansLocal[2];
-    //globalFeatures[2] = meansLocal[3];
-    //globalFeatures[3] = stdsLocal[2];
-    //globalFeatures[4] = stdsLocal[3];
+    globalFeatures[1] = meansLocal[2];
+    globalFeatures[2] = meansLocal[3];
+    globalFeatures[3] = stdsLocal[2];
+    globalFeatures[4] = stdsLocal[3];
   }
 
   public Features() {
