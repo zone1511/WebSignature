@@ -36,10 +36,10 @@ public class SignatureModel extends Model{
   @Column(columnDefinition = "TEXT")
   public HiddenMarkovModel gaussianMixtureModel;
 
-  @Column(columnDefinition = "DOUBLE PRECISION")
+  @Column(columnDefinition = "double precision")
   public double averageTrainingScoreLocal;
 
-  @Column(columnDefinition = "DOUBLE PRECISION")
+  @Column(columnDefinition = "double precision")
   public double averageTrainingScoreGlobal;
 
   @Column(columnDefinition = "TEXT")
