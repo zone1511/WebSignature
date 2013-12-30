@@ -60,7 +60,7 @@ public class SignatureModel extends Model{
 
   public final int nbFeaturesGlobal = 5;
   
-  public final int nbGaussiansGlobal = 1;
+  public final int nbGaussiansGlobal = 2;
 
   @CreatedTimestamp
   Timestamp cretime;
