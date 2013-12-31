@@ -44,11 +44,11 @@
 
   var check_success = function(proba) { 
     $("#check_success").css( "display", "table");
-    if (proba > 0.8) {
-      $("#check_success .info_text").text("OK ! Probability : "+proba);
+    if (proba) {
+      $("#check_success .info_text").text("OK, genuine signature.");
       $("#check_success").css( "background-color", "green");
     } else {
-      $("#check_success .info_text").text("Nope ! Probability : "+proba);
+      $("#check_success .info_text").text("The signature has not been authenticated.");
       $("#check_success").css( "background-color", "red");
     }
     $("#check_success").click(function() {

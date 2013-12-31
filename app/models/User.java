@@ -86,7 +86,7 @@ public class User extends Model {
     return true;
   }
 
-  public double probability(List<double[]> rawSignature) {
+  public boolean probability(List<double[]> rawSignature) {
     System.out.println("Probability");
     Signature signature = new Signature(
         rawSignature,

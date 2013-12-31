@@ -77,7 +77,7 @@ object Enrollment extends Controller {
         val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 20.seconds)
         Async {
           Future.firstCompletedOf(Seq(probab, timeoutFuture)).map { 
-            case i: Double => Ok(Json.obj("probability"->i))
+            case i: Boolean => Ok(Json.obj("probability"->i))
             case t: String => InternalServerError(t)
           }  
         }

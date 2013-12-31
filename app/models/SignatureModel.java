@@ -99,7 +99,7 @@ public class SignatureModel extends Model{
     return true;
   }
 
-  public double probability(Features signature) {
+  public boolean probability(Features signature) {
 
     signature.normalizeLocalFeatures(meanLocal.values(), stdLocal.values());
 
@@ -112,9 +112,11 @@ public class SignatureModel extends Model{
     double scoreGlobal = averageTrainingScoreGlobal/probabilityGlobal;
 
     System.out.println("Score local : "+scoreLocal);
-    System.out.println("Score global : "+scoreGlobal+" p: "+probabilityGlobal);
+    System.out.println("Score global : "+scoreGlobal);
+
+    return ((bound(scoreLocal)>0.7) && (bound(scoreGlobal)>0.2));
     
-    return bound(scoreLocal)*0.6+bound(scoreGlobal)*0.4;
+    //return bound(scoreLocal)*0.6+bound(scoreGlobal)*0.4;
   }
 
   private double bound(double score) {
