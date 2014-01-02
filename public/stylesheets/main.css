@@ -74,6 +74,24 @@ body {
   /*background: #2580a2;*/
 }
 
+@media screen and (max-device-width : 320px) {
+  .info {
+    font-size:10px;
+  }
+  input[type=text] {
+    font-size: 15px;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .info {
+    font-size:30px;
+  }
+  input[type=text] {
+    font-size: 30px;
+  }
+}
+
 .info {
   display:none;
   color: #eee;
@@ -84,7 +102,7 @@ body {
   position:absolute;
   text-align:center;
   background: url(../images/background/px_by_Gre3g/px_by_Gre3g.png) repeat;
-  font-size:30px;
+  /*font-size:30px;*/
   z-index:99;
 }
 
@@ -97,7 +115,7 @@ body {
 }
 
 input[type=text] {
-  font-size: 30px;
+  /*font-size: 30px;*/
   width: 25%;
   border-radius:2px;
   border: solid 1px #ccc;
