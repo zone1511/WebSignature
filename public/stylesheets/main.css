@@ -76,7 +76,7 @@ body {
 
 @media screen and (max-device-width : 320px) {
   .info {
-    font-size:30px;
+    font-size:18px;
     -webkit-text-size-adjust: none;
   }
   input[type=text] {
