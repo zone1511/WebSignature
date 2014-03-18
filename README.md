@@ -15,7 +15,7 @@ to train some Gaussian Mixture models.
 
 This architecture allows to obtain a powerful mobile and cross-device system, with a high usability for both the users and the operator.
 
-## Dependecies
+## Dependencies
 
 This project is using [my fork of the Jahmm library](https://github.com/aubry74/Jahmm), which improves the original library to support Multivariate Gaussian Mixtures in order to model the emission probabilities in Hidden Markov Models. (Only single multivariate gaussians or one dimensional mixtures are supported in the original library).
 
